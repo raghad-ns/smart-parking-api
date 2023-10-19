@@ -7,7 +7,7 @@ import {
   Entity,
   Timestamp,
 } from "typeorm";
-import { Car } from "./Car.js";
+import { User } from "./User.js";
 import { parking } from "./Parking.js";
 import { Wallet } from "./Wallet.js";
 
@@ -25,8 +25,8 @@ export class connection extends BaseEntity {
   @Column()
   cost: number;
 
-  @ManyToOne(() => Car, (car) => car.connections)
-  car: Relation<Car>;
+  @ManyToOne(() => User, (user) => user.connections)
+  car: Relation<User>;
 
   @ManyToOne(() => parking, (parking) => parking.connections)
   parking: Relation<parking>;

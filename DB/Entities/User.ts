@@ -5,18 +5,24 @@ import {
   Entity,
   OneToOne,
   OneToMany,
+  ManyToOne,
+  Relation,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import bcrypt from "bcrypt";
 import { Wallet } from "./Wallet.js";
 import { connection } from "./Connection.js";
-import { Transaction } from "./Transaction.js";
+import { Role } from "./Role.js";
 
 @Entity()
-export class Car extends BaseEntity {
-  @Column({ unique: true })
+export class User extends BaseEntity {
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column()
+  @Column({ unique: true })
+  car_id: string;
+
+  @Column({ nullable: false })
   email: string;
 
   @Column()
@@ -32,8 +38,11 @@ export class Car extends BaseEntity {
   password: string;
 
   @OneToOne(() => Wallet)
-  wallet: Wallet;
+  wallet: Relation<Wallet>;
 
   @OneToMany(() => connection, (connection) => connection.car)
-  connections: connection[];
+  connections: Relation<connection[]>;
+
+  @ManyToOne(() => Role, (role) => role.cars)
+  role: Relation<Role>;
 }

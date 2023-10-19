@@ -8,21 +8,21 @@ import {
   Column,
   Relation,
 } from "typeorm";
-import { Car } from "./Car.js";
+import { User } from "./User.js";
 import { connection } from "./Connection.js";
 import { Transaction } from "./Transaction.js";
 
 @Entity()
 export class Wallet extends BaseEntity {
-  @PrimaryGeneratedColumn("rowid")
+  @PrimaryGeneratedColumn("uuid")
   id: number;
 
-  @Column()
+  @Column({ default: 0 })
   amount: number;
 
-  @OneToOne(() => Car)
+  @OneToOne(() => User)
   @JoinColumn()
-  car: Car;
+  user: User;
 
   @OneToMany(() => connection, (connection) => connection.wallet)
   connections: Relation<connection[]>;
