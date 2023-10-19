@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { Car } from "./Entities/Car";
+import { User } from "./Entities/User";
 import { connection } from "./Entities/Connection";
 import { parking } from "./Entities/Parking";
 import { Reflect } from "./Entities/reflect";
@@ -13,7 +13,7 @@ const dataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  entities: [Car, connection, parking, Reflect, Transaction, Wallet],
+  entities: [User, connection, parking, Reflect, Transaction, Wallet],
   migrations: ["./**/migration/*.ts"],
   synchronize: true,
   logging: true,

@@ -4,6 +4,7 @@ import {
   Column,
   BaseEntity,
   Entity,
+  Relation,
 } from "typeorm";
 import { connection } from "./Connection.js";
 
@@ -23,5 +24,5 @@ export class parking extends BaseEntity {
   status: "available" | "reserved" | "disabled";
 
   @OneToMany(() => connection, (connection) => connection.parking)
-  connections: connection[];
+  connections: Relation<connection[]>;
 }
