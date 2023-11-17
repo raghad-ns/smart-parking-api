@@ -28,6 +28,9 @@ export class User extends BaseEntity {
   @Column()
   owner: string;
 
+  @Column({ type: "enum", enum: ["inactive", "active"], default: "inactive" })
+  status: String;
+
   @BeforeInsert()
   async hashPassword() {
     if (this.password) {
