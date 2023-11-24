@@ -8,8 +8,8 @@ import {
   Column,
   Relation,
 } from "typeorm";
-import { User } from "./User.js";
-import { connection } from "./Connection.js";
+import { Car } from "./Car.js";
+import { Connection } from "./Connection.js";
 import { Transaction } from "./Transaction.js";
 
 @Entity()
@@ -20,12 +20,11 @@ export class Wallet extends BaseEntity {
   @Column({ default: 0 })
   amount: number;
 
-  @OneToOne(() => User)
-  @JoinColumn()
-  user: User;
+  @OneToOne(() => Car)
+  car: Relation<Car>;
 
-  @OneToMany(() => connection, (connection) => connection.wallet)
-  connections: Relation<connection[]>;
+  @OneToMany(() => Connection, (connection) => connection.wallet)
+  connections: Relation<Connection[]>;
 
   @OneToMany(() => Transaction, (Transaction) => Transaction.wallet)
   transactions: Relation<Transaction[]>;

@@ -11,7 +11,7 @@ import {
   Relation,
 } from "typeorm";
 import { Permission } from "./Permission.js";
-import { User } from "./User.js";
+import { Car } from "./Car.js";
 @Entity()
 export class Role extends BaseEntity {
   @PrimaryGeneratedColumn("increment")
@@ -20,8 +20,8 @@ export class Role extends BaseEntity {
   @Column()
   roleName: string;
 
-  @OneToMany(() => User, (car) => car.role)
-  cars: Relation<User[]>;
+  @OneToMany(() => Car, (car) => car.role)
+  cars: Relation<Car[]>;
 
   @ManyToMany(() => Permission, (permission) => permission.roles, {
     eager: true,
