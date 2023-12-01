@@ -1,5 +1,6 @@
 import express from "express";
 import { Car } from "../../DB/Entities/Car.js";
+import { checkPasswordStrength } from "../../controllers/password.js";
 
 const validateNewCar = async (
   req: express.Request,
@@ -28,19 +29,4 @@ const validateNewCar = async (
   }
 };
 
-const passwordMatched = (pass: string, confirm: string) => {
-  if (pass.length === confirm.length) {
-    // for (let i = 0; i < pass.length; i++) {
-    //   if (pass[i] === confirm[i]) {
-    //     continue;
-    //   } else {
-    //     return false;
-    //   }
-    // }
-    return true;
-  } else {
-    return false;
-  }
-};
-
-export { validateNewCar, passwordMatched };
+export default validateNewCar;

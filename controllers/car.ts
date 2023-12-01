@@ -2,7 +2,7 @@ import express from "express";
 import { Car } from "../DB/Entities/Car.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { passwordMatched } from "../middleware/validation/car.js";
+import {checkPasswordStrength, passwordMatched} from "./password.js";
 import { Role } from "../DB/Entities/Role.js";
 import { Wallet } from "../DB/Entities/Wallet.js";
 
@@ -38,6 +38,8 @@ const insertCar = async (req: express.Request, res: express.Response) => {
   }
 };
 
+
+
 const setPassword = async (req: express.Request, res: express.Response) => {
   try {
     const { id, token } = req.params;
@@ -53,12 +55,13 @@ const setPassword = async (req: express.Request, res: express.Response) => {
     if (payload) {
       if (decode !== null && decode.id === car.id) {
         if (car.status === "inactive") {
-          if (passwordMatched(password, password2) === true) {
+          const passwordSt = passwordMatched(password, password2);
+          if (passwordSt === true) {
             car.password = await bcrypt.hash(password, 10);
             car.status = "active";
             await car.save();
           } else {
-            throw "invalid password cridentials";
+            throw `${passwordSt}`;
           }
         } else throw "password already set";
       } else {
