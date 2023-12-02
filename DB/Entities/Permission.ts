@@ -6,7 +6,7 @@ import {
   ManyToMany,
   Relation,
 } from "typeorm";
-import { Role } from "./Role.js";
+import { Role } from "./Role";
 
 @Entity()
 export class Permission extends BaseEntity {

@@ -11,9 +11,9 @@ import {
   JoinColumn
 } from "typeorm";
 import bcrypt from "bcrypt";
-import { Wallet } from "./Wallet.js";
-import { Connection } from "./Connection.js";
-import { Role } from "./Role.js";
+import { Wallet } from "./Wallet";
+import { Connection } from "./Connection";
+import { Role } from "./Role";
 
 
 @Entity()

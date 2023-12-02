@@ -1,6 +1,6 @@
 import express from "express";
-import validateNewCar from "../middleware/validation/car.js";
-import { insertCar, setPassword } from "../controllers/car.js";
+import validateNewCar from "../middleware/validation/car";
+import { insertCar, setPassword } from "../controllers/car";
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
 import express from "express";
-import { Car } from "../../DB/Entities/Car.js";
-import { checkPasswordStrength } from "../../controllers/password.js";
+import { Car } from "../../DB/Entities/Car";
+import { checkPasswordStrength } from "../../controllers/password";
 
 const validateNewCar = async (
   req: express.Request,
