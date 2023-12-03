@@ -2,7 +2,7 @@ import express from "express";
 import { Car } from "../DB/Entities/Car.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import {checkPasswordStrength, passwordMatched} from "./password.js";
+import { passwordMatched } from "./password.js";
 import { Role } from "../DB/Entities/Role.js";
 import { Wallet } from "../DB/Entities/Wallet.js";
 
@@ -13,12 +13,11 @@ const insertCar = async (req: express.Request, res: express.Response) => {
     car.owner = Owner;
     car.car_ID = Car_Id;
     car.email = Email;
-    car.password = Password;
     // let role = await Role.findOneBy({ roleName: "User" });
     // if (role !== null) {
     //   car.role = role;
     // } else {
-    //   res.status(500).send("Error finding the role");
+      // res.status(401).send("Error adding car while finding the role");
     // }
     let wallet = new Wallet();
     car.wallet = wallet;

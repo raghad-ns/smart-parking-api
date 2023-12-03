@@ -1,6 +1,6 @@
+import 'reflect-metadata'
 import express from 'express';
 import dotenv from 'dotenv';
-import 'reflect-metadata'
 import dataSource from './DB/dataSource.js';
 import home from './routes/car.js';
 //For env File 
