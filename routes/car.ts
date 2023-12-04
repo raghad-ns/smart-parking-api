@@ -5,7 +5,7 @@ import {
   validateNewCarByAdmin,
   validateNewManagerByAdmin,
   validateUserLogin,
-} from "../middleware/validation/car.js";
+} from "../middleware/validation/car";
 import {
   insertCar,
   insertManager,
@@ -13,9 +13,9 @@ import {
   setManagerPassword,
   setPassword,
   userLogin,
-} from "../controllers/car.js";
-import { authenticate } from "../middleware/auth/authentication.js";
-import { authorize } from "../middleware/auth/authorization.js";
+} from "../controllers/car";
+import { authenticate } from "../middleware/auth/authentication";
+import { authorize } from "../middleware/auth/authorization";
 
 const router = express.Router();
 

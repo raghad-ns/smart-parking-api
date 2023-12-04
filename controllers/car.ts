@@ -1,10 +1,10 @@
 import express from "express";
-import { Car } from "../DB/Entities/Car.js";
+import { Car } from "../DB/Entities/Car";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { passwordMatched } from "./password.js";
-import { Role } from "../DB/Entities/Role.js";
-import { Wallet } from "../DB/Entities/Wallet.js";
+import { passwordMatched } from "./password";
+import { Role } from "../DB/Entities/Role";
+import { Wallet } from "../DB/Entities/Wallet";
 
 const insertCar = async (req: express.Request, res: express.Response) => {
   try {

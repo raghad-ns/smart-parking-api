@@ -10,8 +10,8 @@ import {
   OneToMany,
   Relation,
 } from "typeorm";
-import { Permission } from "./Permission.js";
-import { Car } from "./Car.js";
+import { Permission } from "./Permission";
+import { Car } from "./Car";
 @Entity()
 export class Role extends BaseEntity {
   @PrimaryGeneratedColumn("increment")

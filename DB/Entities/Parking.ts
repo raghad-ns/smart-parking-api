@@ -6,7 +6,7 @@ import {
   Entity,
   Relation,
 } from "typeorm";
-import { Connection } from "./Connection.js";
+import { Connection } from "./Connection";
 
 @Entity()
 export class Parking extends BaseEntity {
