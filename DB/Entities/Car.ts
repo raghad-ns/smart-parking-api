@@ -21,7 +21,7 @@ export class Car extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ unique: true })
+  @Column()
   car_ID: string;
 
   @Column({ nullable: false })

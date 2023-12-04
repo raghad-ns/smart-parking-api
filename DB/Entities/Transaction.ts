@@ -7,7 +7,7 @@ import {
   Entity,
 } from "typeorm";
 import { Wallet } from "./Wallet.js";
-import { Reflect } from "./Reflect.1.js";
+import { Reflect } from "./Reflect.js";
 
 @Entity()
 export class Transaction extends BaseEntity {

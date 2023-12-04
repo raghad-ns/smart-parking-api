@@ -2,12 +2,13 @@ import { DataSource } from "typeorm";
 import { Car } from "./Entities/Car";
 import { Connection } from "./Entities/Connection";
 import { Parking } from "./Entities/Parking";
-import { Reflect } from "./Entities/Reflect.1";
+import { Reflect } from "./Entities/Reflect";
 import { Transaction } from "./Entities/Transaction";
 import { Wallet } from "./Entities/Wallet";
 import { Permission } from "./Entities/Permission";
 import { Role } from "./Entities/Role";
 import dotenv from "dotenv";
+import { AdminRolesMigration1701638913517 } from "../migration/1701638913517-Admin-Roles-migration";
 dotenv.config();
 
 const dataSource = new DataSource({
@@ -27,6 +28,8 @@ const dataSource = new DataSource({
     Permission,
     Role,
   ],
+  migrations: [AdminRolesMigration1701638913517],
+  migrationsRun: true,
   synchronize: true,
   logging: false,
 });

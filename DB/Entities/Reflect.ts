@@ -1,4 +1,4 @@
-import { OneToMany, PrimaryGeneratedColumn, BaseEntity, Entity, Relation } from "typeorm";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { Transaction } from "./Transaction.js";
 
 @Entity('reflect')
@@ -9,7 +9,7 @@ export class Reflect extends BaseEntity {
   // @Column()
   // owner: string;
 
-  // @Column({ nullable: true })
+  // @Column()
   // amount: number;
 
   @OneToMany(() => Transaction, (transaction) => transaction.source)
