@@ -146,7 +146,7 @@ const setManagerPassword = async (
 
 const managerLogin = async (email: string, password: string) => {
   try {
-    const car = await Car.findOneBy({ email });
+    const car = await Car.findOneBy({ email: email });
 
     const passwordMatching = await bcrypt.compare(
       password,
@@ -172,7 +172,7 @@ const userLogin = async (id: string, password: string) => {
   try {
     const car = await Car.findOneBy({ id });
 
-    if(car !== null && car.status == "active"){const passwordMatching = await bcrypt.compare(
+    if(car !== null){const passwordMatching = await bcrypt.compare(
       password,
       car?.password || ""
     );

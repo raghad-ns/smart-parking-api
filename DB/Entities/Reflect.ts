@@ -1,16 +1,16 @@
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { Transaction } from "./Transaction.js";
 
-@Entity('reflect')
+@Entity()
 export class Reflect extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  // @Column()
-  // owner: string;
+  @Column('text', {nullable: true})
+  owner: string;
 
-  // @Column()
-  // amount: number;
+  @Column('int', {nullable: true})
+  amount: number;
 
   @OneToMany(() => Transaction, (transaction) => transaction.source)
   transactions: Relation<Transaction[]>;

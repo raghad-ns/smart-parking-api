@@ -17,7 +17,8 @@ export class AdminRolesMigration1701638913517 implements MigrationInterface {
     const AdminUser = new Car();
     AdminUser.car_ID = "1";
     AdminUser.email = "201160@ppu.edu.ps";
-    AdminUser.password = process.env.AdminPassword || "";
+    AdminUser.password =  "mohammad123M@";
+    AdminUser.status = 'active';
     AdminUser.role = Admin;
     await AdminUser.save();
 
