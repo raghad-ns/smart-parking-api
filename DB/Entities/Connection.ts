@@ -28,9 +28,9 @@ export class Connection extends BaseEntity {
   @ManyToOne(() => Car, (user) => user.connections)
   car: Relation<Car>;
 
-  @ManyToOne(() => Parking, (parking) => parking.connections)
+  @ManyToOne(() => Parking, (parking) => parking.connections, {eager: true})
   parking: Relation<Parking>;
 
-  @ManyToOne(() => Wallet, (wallet) => wallet.connections)
+  @ManyToOne(() => Wallet, (wallet) => wallet.connections, {eager:true})
   wallet: Relation<Wallet>;
 }

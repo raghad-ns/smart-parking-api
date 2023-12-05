@@ -159,7 +159,7 @@ const managerLogin = async (email: string, password: string) => {
         process.env.PASSWORD_SECRET || "",
         { expiresIn: "2h" }
       );
-      return { token };
+      return { token, car };
     } else {
       throw "Invalid Username or password!";
     }
@@ -183,7 +183,7 @@ const userLogin = async (id: string, password: string) => {
         process.env.PASSWORD_SECRET || "",
         { expiresIn: "2h" }
       );
-      return { token };
+      return { token, car };
     } else {
       throw "Invalid Username or password!";
     }}

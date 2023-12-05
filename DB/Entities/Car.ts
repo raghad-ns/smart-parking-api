@@ -42,13 +42,13 @@ export class Car extends BaseEntity {
   @Column({ nullable: false })
   password: string;
 
-  @OneToOne(() => Wallet)
+  @OneToOne(() => Wallet, {eager: true})
   @JoinColumn()
   wallet: Relation<Wallet>;
 
-  @OneToMany(() => Connection, (connection) => connection.car)
+  @OneToMany(() => Connection, (connection) => connection.car, {eager: true})
   connections: Relation<Connection[]>;
 
-  @ManyToOne(() => Role, (role) => role.cars)
+  @ManyToOne(() => Role, (role) => role.cars, {eager: true})
   role: Relation<Role>;
 }

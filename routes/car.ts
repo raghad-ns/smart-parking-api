@@ -37,7 +37,6 @@ router.post("/manager/signin", validateManagerLogin, (req, res) => {
       res.cookie("token", data.token, {
         maxAge: 30 * 60 * 1000,
       });
-
       res.status(200).send("ok");
     })
     .catch((err) => {
@@ -55,7 +54,6 @@ router.post("/user/signin", validateUserLogin, (req, res) => {
       res.cookie("token", data.token, {
         maxAge: 30 * 60 * 1000,
       });
-
       res.status(200).send("ok");
     })
     .catch((err) => {

@@ -23,6 +23,6 @@ export class Parking extends BaseEntity {
   })
   status: "available" | "reserved" | "disabled";
 
-  @OneToMany(() => Connection, (connection) => connection.parking)
+  @OneToMany(() => Connection, (connection) => connection.parking,)
   connections: Relation<Connection[]>;
 }

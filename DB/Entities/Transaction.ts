@@ -27,10 +27,10 @@ export class Transaction extends BaseEntity {
   })
   status: "Done" | "Failed" | "In_Progress";
 
-  @ManyToOne(() => Wallet, (wallet) => wallet.transactions)
+  @ManyToOne(() => Wallet, (wallet) => wallet.transactions, {eager: true})
   wallet: Relation<Wallet>;
 
-  @ManyToOne(() => Reflect, (reflect) => reflect.transactions)
+  @ManyToOne(() => Reflect, (reflect) => reflect.transactions, {eager: true})
   source: Relation<Reflect>;
 
   @Column("timestamp", { default: () => "CURRENT_TIMESTAMP" })

@@ -22,12 +22,15 @@ export class AdminRolesMigration1701638913517 implements MigrationInterface {
     AdminUser.role = Admin;
     await AdminUser.save();
 
+    const x = new Permission();
+    x.name = "POST_Car";
     const user = new Role();
     user.roleName = "User";
     await user.save();
 
     const Manager = new Role();
     Manager.roleName = "Manager";
+    Manager.permissions = [ x];
     await Manager.save();
   }
 
