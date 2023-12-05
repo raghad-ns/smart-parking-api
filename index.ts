@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import dataSource from './DB/dataSource';
 import home from './routes/car';
@@ -12,6 +13,7 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(express.json());
+app.use(cors());
 app.use(cookieParser());
 app.use("/home", home);
 
