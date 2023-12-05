@@ -106,10 +106,13 @@ const validateManagerLogin = async (
   if (errorList.length) {
     res.status(400).send(errorList);
   } else {
-    const x = Car.findOneBy({ email: user.email });
+    const x = await Car.findOneBy({ email: user.email });
     if (x === null) {
       res.status(500).send("Inter valid credentials");
-    } else {
+    }else if(x.status == "inactive"){
+      res.status(500).send('Set you password first');
+    } 
+    else {
       next();
     }
   }
@@ -133,10 +136,13 @@ const validateUserLogin = async (
   if (errorList.length) {
     res.status(400).send(errorList);
   } else {
-    const x = Car.findOneBy({ car_ID: user.car_ID });
+    const x = await Car.findOneBy({ car_ID: user.car_ID });
     if (x === null) {
       res.status(500).send("Inter valid credentials");
-    } else {
+    }else if(x.status == "inactive"){
+      res.status(500).send('Set you password first');
+    }  
+    else {
       next();
     }
   }
