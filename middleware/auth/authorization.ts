@@ -22,7 +22,7 @@ const authorize = (api: string) => {
       } else {
         res
           .status(403)
-          .send("you don't have the permission to access this resource!");
+          .json({statusCode: 403, message: "you don't have the permission to access this resource!", data:{}});
       }
     };
 };

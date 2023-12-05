@@ -24,7 +24,7 @@ const validateNewCar = async (
   }
 
   if (errorList.length) {
-    return res.status(401).json({ errors: errorList });
+    return res.status(401).json({ statusCode: 401, message: "Invalid car credentials", data: errorList });
   } else {
     next();
   }
@@ -51,7 +51,7 @@ const validateNewCarByAdmin = async (
   }
 
   if (errorList.length) {
-    return res.status(401).json({ errors: errorList });
+    return res.status(401).json({ statusCode: 401, message: "Invalid car credentials", data: errorList });
   } else {
     return true;
   }
@@ -82,7 +82,7 @@ const validateNewManagerByAdmin = async (
   if (car.Role !== "Manager") errorList.push("Invalid Role");
 
   if (errorList.length) {
-    return res.status(401).json({ errors: errorList });
+    return res.status(401).json({ statusCode: 401, message: "Invalid manager credentials", data: errorList });
   } else {
     return true;
   }
@@ -104,13 +104,13 @@ const validateManagerLogin = async (
   });
 
   if (errorList.length) {
-    res.status(400).send(errorList);
+    res.status(401).json({ statusCode: 401, message: "Invalid car credentials", data: errorList });
   } else {
     const x = await Car.findOneBy({ email: user.email });
     if (x === null) {
-      res.status(500).send("Inter valid credentials");
+      res.status(404).json({ statusCode: 404, message: "Inter valid credentials", data: {} });
     }else if(x.status == "inactive"){
-      res.status(500).send('Set you password first');
+      res.status(400).json({ statusCode: 400, message: "Set your password first", data: {} });
     } 
     else {
       next();
@@ -134,13 +134,13 @@ const validateUserLogin = async (
   });
 
   if (errorList.length) {
-    res.status(400).send(errorList);
+    res.status(401).json({ statusCode: 401, message: "Invalid user login credentials", data: errorList });
   } else {
     const x = await Car.findOneBy({ car_ID: user.car_ID });
     if (x === null) {
-      res.status(500).send("Inter valid credentials");
+      res.status(404).json({ statusCode: 404, message: "Invalid car credentials", data: {} });
     }else if(x.status == "inactive"){
-      res.status(500).send('Set you password first');
+      res.status(400).json({ statusCode: 400, message: "Set your password first", data: {} });
     }  
     else {
       next();

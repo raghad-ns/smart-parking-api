@@ -17,7 +17,7 @@ const insertCar = async (req: express.Request, res: express.Response) => {
     if (role !== null) {
       car.role = role;
     } else {
-      res.status(401).send("Error adding car while finding the role");
+      res.status(401).json({statusCode: 401, message: "Error adding car while finding the role", data: {}});
     }
     let wallet = new Wallet();
     car.wallet = wallet;
@@ -30,7 +30,7 @@ const insertCar = async (req: express.Request, res: express.Response) => {
     const secret = process.env.PASSWORD_SECRET + car.id;
     const token = jwt.sign(payload, secret, { expiresIn: "5m" });
     const link = `http://localhost:${process.env.PORT}/home/set-password/${car.id}/${token}`;
-    res.status(201).json({ link: link, car: car });
+    res.status(201).json({ statusCode: 201, message: "User has been add Successfully", data: { passwordLink: link, car: car } });
   } catch (error) {
     console.log(error);
     throw `${error}`;
@@ -41,9 +41,9 @@ const setPassword = async (req: express.Request, res: express.Response) => {
   try {
     const { id, token } = req.params;
     const { Password, Confirm_Password } = req.body;
-    if (!Password || !Confirm_Password)
-      {throw"Invalid credintioals"}
-    else {
+    if (!Password || !Confirm_Password) {
+      throw "Invalid credintioals";
+    } else {
       const car = await Car.findOneBy({ id: id });
       if (car === null) {
         throw "invalid id...";
@@ -85,7 +85,7 @@ const insertManager = async (req: express.Request, res: express.Response) => {
     if (role !== null) {
       car.role = role;
     } else {
-      res.status(400).send("Error adding Manager while finding the role");
+      res.status(400).json({statusCode: 400, message: "Error adding Manager while finding the role", data: {}});
     }
     await car.save();
     const payload = {
@@ -97,9 +97,9 @@ const insertManager = async (req: express.Request, res: express.Response) => {
     console.log("insert manager");
 
     const link = `http://localhost:${process.env.PORT}/home/set-manager-password/${car.email}/${token}`;
-    res.status(201).json({ Manager: car, link: link });
+    res.status(201).json({statusCode: 201, message: "Manager added successfully", data:{manager: car, passwordLink: link}});
   } catch (error) {
-    res.status(500).send(`Internal server Error: ${error}`);
+    res.status(500).json({statusCode: 500, message: `Internal server Error: ${error}`, data:{}});
   }
 };
 
@@ -172,25 +172,33 @@ const userLogin = async (id: string, password: string) => {
   try {
     const car = await Car.findOneBy({ id });
 
-    if(car !== null){const passwordMatching = await bcrypt.compare(
-      password,
-      car?.password || ""
-    );
-
-    if (car !== null && passwordMatching) {
-      const token = jwt.sign(
-        { userId: car.id, email: car.email },
-        process.env.PASSWORD_SECRET || "",
-        { expiresIn: "2h" }
+    if (car !== null) {
+      const passwordMatching = await bcrypt.compare(
+        password,
+        car?.password || ""
       );
-      return { token, car };
-    } else {
-      throw "Invalid Username or password!";
-    }}
-    else throw "car dosn't exist or the password not set";
+
+      if (car !== null && passwordMatching) {
+        const token = jwt.sign(
+          { userId: car.id, email: car.email },
+          process.env.PASSWORD_SECRET || "",
+          { expiresIn: "2h" }
+        );
+        return { token, car };
+      } else {
+        throw "Invalid Username or password!";
+      }
+    } else throw "car dosn't exist or the password not set";
   } catch (error) {
     throw "Invalid Username or password!";
   }
 };
 
-export { insertCar, setPassword, insertManager, setManagerPassword, managerLogin, userLogin };
+export {
+  insertCar,
+  setPassword,
+  insertManager,
+  setManagerPassword,
+  managerLogin,
+  userLogin,
+};

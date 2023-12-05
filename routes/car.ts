@@ -23,7 +23,7 @@ router.post("/signup",authenticate, authorize("POST_Car"), validateNewCar, (req,
   try {
     insertCar(req, res);
   } catch (error) {
-    res.status(500).send(`Server Error while car registration: ${error}`);
+    res.status(500).json({ statusCode: 500, message: "Internal server error", data: {error} });
   }
 });
 
@@ -37,10 +37,10 @@ router.post("/manager/signin", validateManagerLogin, (req, res) => {
       res.cookie("token", data.token, {
         maxAge: 30 * 60 * 1000,
       });
-      res.status(200).send("ok");
+      res.status(200).json({ statusCode: 200, message: "Ok", data: data });
     })
     .catch((err) => {
-      res.status(400).send("pleas try again with valid credintials");
+      res.status(400).json({ statusCode: 400, message: "Invalid manager sign in credentials", data: {} });
     });
 });
 
@@ -54,10 +54,10 @@ router.post("/user/signin", validateUserLogin, (req, res) => {
       res.cookie("token", data.token, {
         maxAge: 30 * 60 * 1000,
       });
-      res.status(200).send("ok");
+      res.status(200).json({ statusCode: 200, message: "Ok", data: data });
     })
     .catch((err) => {
-      res.status(400).send("pleas try again with valid credintials");
+      res.status(400).json({ statusCode: 400, message: "Invalid user sign in credentials", data: {} });
     });
 });
 
@@ -69,7 +69,7 @@ router.post("/POST_car",authenticate, authorize("Admin"), async (req, res) => {
         insertCar(req, res);
       }
     } catch (error) {
-      res.status(500).send(`Server Error while car registration: ${error}`);
+      res.status(500).json({statusCode: 500, message: "Server error while car registration", data:{}});
     }
   } else if (req.body.Role === "Manager") {
     try {
@@ -79,18 +79,18 @@ router.post("/POST_car",authenticate, authorize("Admin"), async (req, res) => {
         insertManager(req, res);
       }
     } catch (err) {
-      res.status(500).send(`internal server error: ${err}`);
+      res.status(500).json({statusCode: 500, message: "internal server error", data: {err}});
     }
-  } else res.status(401).send("Bad Request");
+  } else res.status(401).json({statusCode: 401, message: "Invalid manager credentials", data: {}});
 });
 
 router.post("/set-manager-password/:email/:token", async (req, res) => {
   setManagerPassword(req, res)
     .then(() => {
-      res.status(200).send(`Password has been set successfully`);
+      res.status(200).json({statusCode: 200, message: "Password has been set successfully", data: {}});
     })
     .catch((err) => {
-      res.status(400).send(err);
+      res.status(400).json({statusCode: 400, message: "Not accepted password", data: {err}});
     });
 });
 
@@ -98,13 +98,13 @@ router.post("/set-password/:id/:token", async (req, res) => {
   try {
     setPassword(req, res)
       .then(() => {
-        res.status(200).send(`password has been set successfully`);
+        res.status(200).json({statusCode: 200, message: "Password has been set successfully", data: {}});
       })
       .catch((err) => {
-        res.status(400).send(err);
+        res.status(400).json({statusCode: 400, message: "Not accepted password", data: {err}});
       });
   } catch (error) {
-    res.status(500).send("Internal server error");
+    res.status(500).json({statusCode: 500, message: "Internal server error", data: {}});
   }
 });
 

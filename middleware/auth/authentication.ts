@@ -19,10 +19,9 @@ const authenticate = async (
   if (tokenIsValid) {
     const decoded = jwt.decode(token, { json: true });
     const car = await Car.findOneBy({ car_ID: decoded?.car_ID || "" });
-    res.locals.car = car;
     next();
   } else {
-    res.status(401).send("Log in first");
+    res.status(401).json({statusCode: 401, message: "You need to log in", data:{}});
   }
 };
 
