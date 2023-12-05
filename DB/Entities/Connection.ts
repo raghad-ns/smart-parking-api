@@ -7,9 +7,9 @@ import {
   Entity,
   Timestamp,
 } from "typeorm";
-import { Car } from "./Car.js";
-import { Parking } from "./Parking.js";
-import { Wallet } from "./Wallet.js";
+import { Car } from "./Car";
+import { Parking } from "./Parking";
+import { Wallet } from "./Wallet";
 
 @Entity()
 export class Connection extends BaseEntity {

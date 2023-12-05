@@ -8,9 +8,9 @@ import {
   Column,
   Relation,
 } from "typeorm";
-import { Car } from "./Car.js";
-import { Connection } from "./Connection.js";
-import { Transaction } from "./Transaction.js";
+import { Car } from "./Car";
+import { Connection } from "./Connection";
+import { Transaction } from "./Transaction";
 
 @Entity()
 export class Wallet extends BaseEntity {

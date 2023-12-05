@@ -1,5 +1,5 @@
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
-import { Transaction } from "./Transaction.js";
+import { Transaction } from "./Transaction";
 
 @Entity()
 export class Reflect extends BaseEntity {
