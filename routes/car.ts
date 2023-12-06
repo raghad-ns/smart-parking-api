@@ -19,7 +19,7 @@ import { authorize } from "../middleware/auth/authorization";
 
 const router = express.Router();
 
-router.post("/signup",authenticate, authorize("POST_Car"), validateNewCar, (req, res) => {
+router.post("/signup",authenticate, validateNewCar, (req, res) => {
   try {
     insertCar(req, res);
   } catch (error) {

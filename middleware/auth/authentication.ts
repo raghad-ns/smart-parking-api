@@ -7,8 +7,7 @@ const authenticate = async (
   res: express.Response,
   next: express.NextFunction
 ) => {
-  const token = req.cookies["token"] || "";
-
+  const token = req.headers["authorization"]|| "";
   let tokenIsValid;
   try {
     tokenIsValid = jwt.verify(token, process.env.PASSWORD_SECRET || "");
@@ -21,7 +20,9 @@ const authenticate = async (
     const car = await Car.findOneBy({ car_ID: decoded?.car_ID || "" });
     next();
   } else {
-    res.status(401).json({statusCode: 401, message: "You need to log in", data:{}});
+    res
+      .status(401)
+      .json({ statusCode: 401, message: "You need to log in", data: {} });
   }
 };
 
