@@ -106,7 +106,7 @@ const validateManagerLogin = async (
   if (errorList.length) {
     res.status(401).json({ statusCode: 401, message: "Invalid car credentials", data: errorList });
   } else {
-    const x = await Car.findOneBy({ email: user.email });
+    const x = await Car.findOneBy({ email: user.Email });
     if (x === null) {
       res.status(404).json({ statusCode: 404, message: "Inter valid credentials", data: {} });
     }else if(x.status == "inactive"){
