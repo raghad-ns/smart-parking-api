@@ -7,29 +7,29 @@ import {
   Entity,
   Timestamp,
 } from "typeorm";
-import { User } from "./User.js";
-import { parking } from "./Parking.js";
-import { Wallet } from "./Wallet.js";
+import { Car } from "./Car";
+import { Parking } from "./Parking";
+import { Wallet } from "./Wallet";
 
 @Entity()
-export class connection extends BaseEntity {
+export class Connection extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column()
-  start_time = Timestamp;
+  start_time: Date;
 
   @Column()
-  end_time = Timestamp;
+  end_time: Date;
 
   @Column()
   cost: number;
 
-  @ManyToOne(() => User, (user) => user.connections)
-  car: Relation<User>;
+  @ManyToOne(() => Car, (user) => user.connections)
+  car: Relation<Car>;
 
-  @ManyToOne(() => parking, (parking) => parking.connections)
-  parking: Relation<parking>;
+  @ManyToOne(() => Parking, (parking) => parking.connections)
+  parking: Relation<Parking>;
 
   @ManyToOne(() => Wallet, (wallet) => wallet.connections)
   wallet: Relation<Wallet>;

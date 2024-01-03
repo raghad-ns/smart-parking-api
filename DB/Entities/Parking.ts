@@ -6,10 +6,10 @@ import {
   Entity,
   Relation,
 } from "typeorm";
-import { connection } from "./Connection.js";
+import { Connection } from "./Connection";
 
 @Entity()
-export class parking extends BaseEntity {
+export class Parking extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
@@ -23,6 +23,6 @@ export class parking extends BaseEntity {
   })
   status: "available" | "reserved" | "disabled";
 
-  @OneToMany(() => connection, (connection) => connection.parking)
-  connections: Relation<connection[]>;
+  @OneToMany(() => Connection, (connection) => connection.parking)
+  connections: Relation<Connection[]>;
 }
