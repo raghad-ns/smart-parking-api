@@ -163,7 +163,7 @@ const validateUserLogin = async (
       data: errorList,
     });
   } else {
-    const x = await Car.findOneBy({ car_ID: user.car_ID });
+    const x = await Car.findOneBy({ car_ID: user.Car_ID });
     if (x === null) {
       res.status(404).json({
         statusCode: 404,

@@ -57,7 +57,7 @@ router.post("/user/signin", validateUserLogin, (req, res) => {
       res.status(200).json({ statusCode: 200, message: "Ok", data: data });
     })
     .catch((err) => {
-      res.status(400).json({ statusCode: 400, message: "Invalid user sign in credentials", data: {} });
+      res.status(400).json({ statusCode: 400, message: err, data: {} });
     });
 });
 
