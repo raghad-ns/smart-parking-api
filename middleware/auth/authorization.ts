@@ -8,9 +8,9 @@ const authorize = (api: string) => {
     res: express.Response,
     next: express.NextFunction
   ) => {
-    const token = req.cookies["token"] || "";
+    const token = req.headers["authorization"] || "";  
     const decoded = jwt.decode(token, { json: true });
-    const car = await Car.findOneBy({ id: decoded?.id });
+    const car = await Car.findOneBy({ id: decoded?.userId });
     const permissions: Permission[] = car?.role?.permissions || [];
     console.log("permissions: ", permissions);
     if (

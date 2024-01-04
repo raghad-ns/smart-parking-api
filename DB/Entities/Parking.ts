@@ -14,6 +14,9 @@ export class Parking extends BaseEntity {
   id: string;
 
   @Column()
+  customid: number;
+
+  @Column()
   location: string;
 
   @Column({
