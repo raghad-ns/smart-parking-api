@@ -8,25 +8,30 @@ import {
   ManyToOne,
   Relation,
   PrimaryGeneratedColumn,
+  JoinColumn
 } from "typeorm";
 import bcrypt from "bcrypt";
-import { Wallet } from "./Wallet.js";
-import { connection } from "./Connection.js";
-import { Role } from "./Role.js";
+import { Wallet } from "./Wallet";
+import { Connection } from "./Connection";
+import { Role } from "./Role";
+
 
 @Entity()
-export class User extends BaseEntity {
+export class Car extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ unique: true })
-  car_id: string;
+  @Column()
+  car_ID: string;
 
   @Column({ nullable: false })
   email: string;
 
   @Column()
   owner: string;
+
+  @Column({ type: "enum", enum: ["inactive", "active"], default: "inactive" })
+  status: "inactive" | "active";
 
   @BeforeInsert()
   async hashPassword() {
@@ -37,12 +42,13 @@ export class User extends BaseEntity {
   @Column({ nullable: false })
   password: string;
 
-  @OneToOne(() => Wallet)
+  @OneToOne(() => Wallet, {eager: true})
+  @JoinColumn()
   wallet: Relation<Wallet>;
 
-  @OneToMany(() => connection, (connection) => connection.car)
-  connections: Relation<connection[]>;
+  @OneToMany(() => Connection, (connection) => connection.car, {eager: true})
+  connections: Relation<Connection[]>;
 
-  @ManyToOne(() => Role, (role) => role.cars)
+  @ManyToOne(() => Role, (role) => role.cars, {eager: true})
   role: Relation<Role>;
 }
