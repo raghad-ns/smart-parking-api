@@ -33,6 +33,12 @@ router.get("/", authenticate, authorize("GET_parkings"), (req, res) => {
     page: req.query.page?.toString() || "1",
     pageSize: req.query.pageSize?.toString() || "10",
   };
+  getAllParkings(payload).then((data) => {
+    res.status(200).json({statusCode: 200, message: "parkings retrived", data: {data}})
+  })
+  .catch(err => {
+    res.status(500).json({statusCode: 500, message: "Internal server error", data: {err}})
+  })
 });
 
 router.put("/", (req, res) => {});
