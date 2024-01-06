@@ -1,4 +1,4 @@
-interface GetAll {
+export interface GetAll {
     page: string;
     pageSize: string;
   }
