@@ -1,21 +1,30 @@
-import { Column } from "typeorm/browser";
-import { OneToMany } from "typeorm/browser";
-import { PrimaryGeneratedColumn } from "typeorm/browser";
-import { BaseEntity } from "typeorm/browser";
-import { Entity } from "typeorm/browser";
-import { Transaction } from "./Transaction.js";
+import { BaseEntity, BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
+import { Transaction } from "./Transaction";
+import bcrypt from 'bcrypt'
 
 @Entity()
 export class Reflect extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ unique: true })
+  @Column('text', {nullable: true})
   owner: string;
 
-  @Column({ default: 0 })
+  @Column('int', {nullable: true})
   amount: number;
 
+  @BeforeInsert()
+  async hashPassword() {
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
+  }
+  @Column('text')
+  password: string;
+
+  @Column('text')
+  mobileNo: string;
+
   @OneToMany(() => Transaction, (transaction) => transaction.source)
-  transactions: Transaction[];
+  transactions: Relation<Transaction[]>;
 }

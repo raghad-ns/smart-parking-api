@@ -6,8 +6,8 @@ import {
   BaseEntity,
   Entity,
 } from "typeorm";
-import { Wallet } from "./Wallet.js";
-import { Reflect } from "./reflect.js";
+import { Wallet } from "./Wallet";
+import { Reflect } from "./Reflect";
 
 @Entity()
 export class Transaction extends BaseEntity {
@@ -22,15 +22,15 @@ export class Transaction extends BaseEntity {
 
   @Column({
     type: "enum",
-    enum: ["Done", "Failed", "In Progress"],
-    default: "available",
+    enum: ["Done", "Failed", "In_Progress"],
+    default: "In_Progress",
   })
-  status: "Done" | "Failed" | "In Progress";
+  status: "Done" | "Failed" | "In_Progress";
 
-  @ManyToOne(() => Wallet, (wallet) => wallet.transactions)
+  @ManyToOne(() => Wallet, (wallet) => wallet.transactions, {eager: true})
   wallet: Relation<Wallet>;
 
-  @ManyToOne(() => Reflect, (reflect) => reflect.transactions)
+  @ManyToOne(() => Reflect, (reflect) => reflect.transactions, {eager: true})
   source: Relation<Reflect>;
 
   @Column("timestamp", { default: () => "CURRENT_TIMESTAMP" })
