@@ -7,11 +7,14 @@ export class Reflect extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column('text', {nullable: true})
+  @Column('text', {nullable: false})
   owner: string;
 
-  @Column('int', {nullable: true})
+  @Column('int', {nullable: true, default:0})
   amount: number;
+
+  @Column('int', {nullable: false})
+  code: number;
 
   @BeforeInsert()
   async hashPassword() {
@@ -22,7 +25,7 @@ export class Reflect extends BaseEntity {
   @Column('text')
   password: string;
 
-  @Column('text')
+  @Column('text', {nullable: false})
   mobileNo: string;
 
   @OneToMany(() => Transaction, (transaction) => transaction.source)
