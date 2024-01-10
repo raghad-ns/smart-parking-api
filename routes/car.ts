@@ -16,6 +16,7 @@ import {
 } from "../controllers/car";
 import { authenticate } from "../middleware/auth/authentication";
 import { authorize } from "../middleware/auth/authorization";
+import { Token } from "../DB/Entities/Tokent";
 
 const router = express.Router();
 
@@ -31,12 +32,9 @@ router.post("/manager/signin", validateManagerLogin, (req, res) => {
   const { Email, Password } = req.body;
   managerLogin(Email, Password)
     .then((data) => {
-      res.cookie("loginTime", Date.now(), {
-        maxAge: 60 * 60 * 1000,
-      });
-      res.cookie("token", data.token, {
-        maxAge: 30 * 60 * 1000,
-      });
+      const token = new Token();
+      token.token = data.token;
+      token.save();
       res.status(200).json({ statusCode: 200, message: "Ok", data: data });
     })
     .catch((err) => {
@@ -48,12 +46,9 @@ router.post("/user/signin", validateUserLogin, (req, res) => {
   const { Car_ID, Password } = req.body;
   userLogin(Car_ID, Password)
     .then((data) => {
-      res.cookie("loginTime", Date.now(), {
-        maxAge: 60 * 60 * 1000,
-      });
-      res.cookie("token", data.token, {
-        maxAge: 30 * 60 * 1000,
-      });
+      const token = new Token();
+      token.token = data.token;
+      token.save();
       res.status(200).json({ statusCode: 200, message: "Ok", data: data });
     })
     .catch((err) => {
@@ -107,5 +102,14 @@ router.post("/set-password/:id/:token", async (req, res) => {
     res.status(500).json({statusCode: 500, message: "Internal server error", data: {}});
   }
 });
+
+router.post('/signout',authenticate, async(req, res)=> {
+  const token = req.headers["authorization"] || "";
+  const del = await Token.findOneBy({token: token});
+  if(del){
+    await del.remove();
+  }
+  return res.status(200).json({statusCode: 200, message: "signed out successfully", data: {}});
+})
 
 export default router;
