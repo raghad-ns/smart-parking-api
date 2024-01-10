@@ -8,6 +8,7 @@ import home from './routes/car';
 import fs from 'fs'
 import https from 'https';
 import parking from './routes/parking';
+import reflect from './routes/reflect'
 //For env File 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use(cors());
 app.use(cookieParser());
 app.use("/home", home);
 app.use('/parking', parking);
+app.use("/Reflect", reflect)
 
 app.get('/', (req, res) => {
   res.send('Welcome to Express & TypeScript Server');
