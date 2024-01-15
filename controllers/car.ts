@@ -159,6 +159,8 @@ const managerLogin = async (email: string, password: string) => {
         process.env.PASSWORD_SECRET || "",
         { expiresIn: "2h" }
       );
+      car.token = token;
+      await car.save();
       return { token, car };
     } else {
       throw "Invalid Username or password!";
@@ -171,8 +173,7 @@ const managerLogin = async (email: string, password: string) => {
 const userLogin = async (id: string, password: string) => {
   try {
     const car = await Car.findOneBy({ car_ID: id });
-    console.log(car);
-    
+
     if (car !== null) {
       const passwordMatching = await bcrypt.compare(
         password,
@@ -185,6 +186,8 @@ const userLogin = async (id: string, password: string) => {
           process.env.PASSWORD_SECRET || "",
           { expiresIn: "2h" }
         );
+        car.token = token;
+        await car.save();
         return { token, car };
       } else {
         throw "Invalid Username or password!";

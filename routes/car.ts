@@ -17,6 +17,7 @@ import {
 import { authenticate } from "../middleware/auth/authentication";
 import { authorize } from "../middleware/auth/authorization";
 import { Token } from "../DB/Entities/Tokent";
+import { Car } from "../DB/Entities/Car";
 
 const router = express.Router();
 
@@ -32,9 +33,6 @@ router.post("/manager/signin", validateManagerLogin, (req, res) => {
   const { Email, Password } = req.body;
   managerLogin(Email, Password)
     .then((data) => {
-      const token = new Token();
-      token.token = data.token;
-      token.save();
       res.status(200).json({ statusCode: 200, message: "Ok", data: data });
     })
     .catch((err) => {
@@ -46,9 +44,6 @@ router.post("/user/signin", validateUserLogin, (req, res) => {
   const { Car_ID, Password } = req.body;
   userLogin(Car_ID, Password)
     .then((data) => {
-      const token = new Token();
-      token.token = data.token;
-      token.save();
       res.status(200).json({ statusCode: 200, message: "Ok", data: data });
     })
     .catch((err) => {
@@ -105,9 +100,10 @@ router.post("/set-password/:id/:token", async (req, res) => {
 
 router.post('/signout',authenticate, async(req, res)=> {
   const token = req.headers["authorization"] || "";
-  const del = await Token.findOneBy({token: token});
+  const del = await Car.findOneBy({token: token});
   if(del){
-    await del.remove();
+    del.token = "";
+    await del.save();
   }
   return res.status(200).json({statusCode: 200, message: "signed out successfully", data: {}});
 })
