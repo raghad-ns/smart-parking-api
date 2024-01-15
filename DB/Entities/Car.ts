@@ -42,6 +42,9 @@ export class Car extends BaseEntity {
   @Column({ nullable: false })
   password: string;
 
+  @Column('text')
+  token?: string;
+
   @OneToOne(() => Wallet, {eager: true})
   @JoinColumn()
   wallet: Relation<Wallet>;

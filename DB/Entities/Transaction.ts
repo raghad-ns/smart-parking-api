@@ -20,6 +20,9 @@ export class Transaction extends BaseEntity {
   @Column()
   amount: number;
 
+  @Column("text")
+  OTP: string;
+
   @Column({
     type: "enum",
     enum: ["Done", "Failed", "In_Progress"],

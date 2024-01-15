@@ -1,12 +1,15 @@
 import express from "express";
 import { Reflect } from "../../DB/Entities/Reflect";
-import { checkPasswordStrength, passwordMatched } from "../../controllers/password";
+import {
+  checkPasswordStrength,
+  passwordMatched,
+} from "../../controllers/password";
 const validateReflect = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
 ) => {
-  const values = ["owner", "code", "mobileNo", "password", "cofirm_password", "amount"];
+  const values = ["owner", "mobileNo", "password", "cofirm_password", "amount"];
   const car = req.body;
   let errorList = [];
   values.forEach((key) => {
@@ -21,20 +24,16 @@ const validateReflect = async (
     errorList.push("Invalid mobile number");
   }
 
-  if (car.code) 
-  {
-    const code: string = car.code;
-    if (code.length !== 4) {
-      errorList.push("Invalid transaction code");
+  try {
+    const amount = parseFloat(car.amount);
+    if (amount < 0) {
+      errorList.push(`you should add possitive amount`);
     }
+  } catch (err) {
+    errorList.push("invalid amount format");
   }
 
-  const amount = parseFloat(car.amount);
-  if(amount< 0)
-  {
-    errorList.push(`you should add possitive amount`);
-  }
-  const password = car.password.toString()
+  const password = car.password.toString();
   const confirm = car.cofirm_password.toString();
   const status = passwordMatched(password, confirm);
   if (status !== true) {
