@@ -17,7 +17,7 @@ export class Wallet extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: number;
 
-  @Column({ default: 0 })
+  @Column('float',{ default: 0 })
   amount: number;
 
   @OneToOne(() => Car)
