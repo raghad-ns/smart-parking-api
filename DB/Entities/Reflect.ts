@@ -10,11 +10,9 @@ export class Reflect extends BaseEntity {
   @Column('text', {nullable: false})
   owner: string;
 
-  @Column('int', {nullable: true, default:0})
+  @Column('float', {nullable: true, default:10})
   amount: number;
 
-  @Column('int', {nullable: false})
-  code: number;
 
   @BeforeInsert()
   async hashPassword() {

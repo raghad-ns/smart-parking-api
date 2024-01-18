@@ -33,14 +33,14 @@ const validateReflect = async (
     errorList.push("invalid amount format");
   }
 
-  const password = car.password.toString();
-  const confirm = car.cofirm_password.toString();
+  const password = String(car.password);
+  const confirm = String(car.cofirm_password);
   const status = passwordMatched(password, confirm);
   if (status !== true) {
     errorList.push(status);
   }
 
-  if (errorList.length) {
+  if (errorList.length > 0) {
     return res.status(401).json({
       statusCode: 401,
       message: "Invalid Reflect credentials",
