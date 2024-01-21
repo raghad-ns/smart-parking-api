@@ -15,7 +15,7 @@ import { Transaction } from "./Transaction";
 @Entity()
 export class Wallet extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
-  id: number;
+  id: string;
 
   @Column('float',{ default: 0 })
   amount: number;
