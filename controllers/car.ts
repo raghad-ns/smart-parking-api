@@ -29,7 +29,7 @@ const insertCar = async (req: express.Request, res: express.Response) => {
     };
     const secret = process.env.PASSWORD_SECRET + car.id;
     const token = jwt.sign(payload, secret, { expiresIn: "5m" });
-    const link = `http://localhost:${process.env.PORT}/home/set-password/${car.id}/${token}`;
+    const link = `https://localhost:${process.env.PORT}/home/set-password/${car.id}/${token}`;
     res.status(201).json({ statusCode: 201, message: "User has been add Successfully", data: { passwordLink: link, car: car } });
   } catch (error) {
     console.log(error);
