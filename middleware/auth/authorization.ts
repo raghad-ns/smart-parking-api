@@ -15,7 +15,7 @@ const authorize = (api: string) => {
     console.log("permissions: ", permissions);
     if (
       permissions.filter((p) => {
-        return p.name === api || p.name === "Admin";
+        return p.name === api;
       }).length > 0
     ) {
       next();
