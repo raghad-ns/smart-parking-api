@@ -9,7 +9,6 @@ import { Permission } from "./Entities/Permission";
 import { Role } from "./Entities/Role";
 import dotenv from "dotenv";
 import { AdminRolesMigration1701638913517 } from "../migration/1701638913517-Admin-Roles-migration";
-import { Token } from "./Entities/Tokent";
 dotenv.config();
 
 const dataSource = new DataSource({
@@ -28,7 +27,6 @@ const dataSource = new DataSource({
     Wallet,
     Permission,
     Role,
-    Token
   ],
   migrations: [AdminRolesMigration1701638913517],
   migrationsRun: true,

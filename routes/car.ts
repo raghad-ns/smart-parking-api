@@ -16,7 +16,6 @@ import {
 } from "../controllers/car";
 import { authenticate } from "../middleware/auth/authentication";
 import { authorize } from "../middleware/auth/authorization";
-import { Token } from "../DB/Entities/Tokent";
 import { Car } from "../DB/Entities/Car";
 
 const router = express.Router();
