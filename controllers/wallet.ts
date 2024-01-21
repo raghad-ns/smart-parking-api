@@ -39,6 +39,6 @@ const getWalletTransactions = async (
     data.type = transactions[i].type;
     test.push(data);
   }
-  res.status(200).json({statusCode: 200, message:"OK", data: test});
+  res.status(200).json({ statusCode: 200, message: "OK", data: test });
 };
 export default getWalletTransactions;

@@ -12,32 +12,5 @@ router.get("", authenticate, async (req, res) => {
     pageSize: req.query.pageSize?.toString() || "10",
   };
   getWalletTransactions(req, res, payload);
-  ////////////////////////////////
-  const car = await Car.findOneBy({ car_ID: req.body.car_ID });
-  //find the wallet done transactions
-  const [transactions, total] = await Transaction.findAndCount({
-    relations: { wallet: true },
-    where: {
-      status: "Done",
-      wallet: { id: car?.wallet.id },
-    },
-  });
-  //changing the form of wallet transactions
-  let test: Transactions[] = [];
-  for (let i = 0; i < total; i++) {
-    let data: Transactions = {
-      balance: 0,
-      confirmed: new Date(),
-      from: "",
-      type: "",
-    };
-    data.balance = transactions[i].amount;
-    data.confirmed = transactions[i].confirmedAt;
-    data.from = transactions[i].source.mobileNo;
-    data.type = transactions[i].type;
-    test.push(data);
-  }
-
-  res.status(200).json({ test: test, total });
 });
 export default router;
