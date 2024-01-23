@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import { passwordMatched } from "./password";
 import { Role } from "../DB/Entities/Role";
 import { Wallet } from "../DB/Entities/Wallet";
+import { In } from "typeorm";
 
 const insertCar = async (req: express.Request, res: express.Response) => {
   try {
@@ -17,7 +18,11 @@ const insertCar = async (req: express.Request, res: express.Response) => {
     if (role !== null) {
       car.role = role;
     } else {
-      res.status(401).json({statusCode: 401, message: "Error adding car while finding the role", data: {}});
+      res.status(401).json({
+        statusCode: 401,
+        message: "Error adding car while finding the role",
+        data: {},
+      });
     }
     let wallet = new Wallet();
     car.wallet = wallet;
@@ -30,7 +35,11 @@ const insertCar = async (req: express.Request, res: express.Response) => {
     const secret = process.env.PASSWORD_SECRET + car.id;
     const token = jwt.sign(payload, secret, { expiresIn: "5m" });
     const link = `https://localhost:${process.env.PORT}/home/set-password/${car.id}/${token}`;
-    res.status(201).json({ statusCode: 201, message: "User has been add Successfully", data: { passwordLink: link, car: car } });
+    res.status(201).json({
+      statusCode: 201,
+      message: "User has been add Successfully",
+      data: { passwordLink: link, car: car },
+    });
   } catch (error) {
     console.log(error);
     throw `${error}`;
@@ -41,6 +50,9 @@ const setPassword = async (req: express.Request, res: express.Response) => {
   try {
     const { id, token } = req.params;
     const { Password, Confirm_Password } = req.body;
+    if (!id || !token) {
+      throw "invalid link";
+    }
     if (!Password || !Confirm_Password) {
       throw "Invalid credintioals";
     } else {
@@ -85,7 +97,11 @@ const insertManager = async (req: express.Request, res: express.Response) => {
     if (role !== null) {
       car.role = role;
     } else {
-      res.status(400).json({statusCode: 400, message: "Error adding Manager while finding the role", data: {}});
+      res.status(400).json({
+        statusCode: 400,
+        message: "Error adding Manager while finding the role",
+        data: {},
+      });
     }
     await car.save();
     const payload = {
@@ -96,10 +112,18 @@ const insertManager = async (req: express.Request, res: express.Response) => {
     const token = jwt.sign(payload, secret, { expiresIn: "5m" });
     console.log("insert manager");
 
-    const link = `http://localhost:${process.env.PORT}/home/set-manager-password/${car.email}/${token}`;
-    res.status(201).json({statusCode: 201, message: "Manager added successfully", data:{manager: car, passwordLink: link}});
+    const link = `https://localhost:${process.env.PORT}/home/set-manager-password/${car.email}/${token}`;
+    res.status(201).json({
+      statusCode: 201,
+      message: "Manager added successfully",
+      data: { manager: car, passwordLink: link },
+    });
   } catch (error) {
-    res.status(500).json({statusCode: 500, message: `Internal server Error: ${error}`, data:{}});
+    res.status(500).json({
+      statusCode: 500,
+      message: `Internal server Error: ${error}`,
+      data: {},
+    });
   }
 };
 
@@ -109,17 +133,18 @@ const setManagerPassword = async (
 ) => {
   try {
     const { email, token } = req.params;
+    if (!email || !token) {
+      throw "invalid link";
+    }
     const { Password, Confirm_Password } = req.body;
     const car = await Car.findOneBy({ email: email });
     if (car === null) {
-      throw "invalid id...";
+      throw "invalid link...";
       return;
     }
     const secret = process.env.PASSWORD_SECRET + car.email;
     const payload = jwt.verify(token, secret);
     const decode = jwt.decode(token, { json: true });
-    console.log(payload);
-    console.log(secret);
 
     if (payload) {
       if (decode !== null && decode.id === car.id) {
@@ -146,22 +171,41 @@ const setManagerPassword = async (
 
 const managerLogin = async (email: string, password: string) => {
   try {
-    const car = await Car.findOneBy({ email: email });
-
+    const [car, count] = await Car.findAndCount({
+      relations: { role: true },
+      where: { email: email, role: { roleName: In(["Manager", "Admin"]) }, status: "active" },
+    });
+    console.log(car, count);
+    
+    let x: Car = new Car();
+    // for (let i = 0; i < car.length; i++) {
+    //   if (car[i].email === email) {
+    //     x = car[i];
+    //     break;
+    //   }
+    // }
+    x = car[0];
+    if(x.email === "" || null)
+    {
+      throw "invalid credintials"
+    }
+    const manager: Car = x;
+    console.log("-------------", manager);
+    
     const passwordMatching = await bcrypt.compare(
       password,
-      car?.password || ""
+      manager?.password || ""
     );
 
     if (car !== null && passwordMatching) {
       const token = jwt.sign(
-        { userId: car.id, email: car.email },
+        { userId: manager.id, email: manager.email },
         process.env.PASSWORD_SECRET || "",
-        { expiresIn: "2h" }
+        { expiresIn: "2h", allowInsecureKeySizes: false }
       );
-      car.token = token;
-      await car.save();
-      return { token, car };
+      manager.token = token;
+      await manager.save();
+      return { token, car: manager };
     } else {
       throw "Invalid Username or password!";
     }

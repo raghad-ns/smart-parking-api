@@ -1,7 +1,6 @@
 import express from "express";
 import { Car } from "../../DB/Entities/Car";
-import { checkPasswordStrength } from "../../controllers/password";
-import { error } from "console";
+import { In } from "typeorm";
 
 const validateNewCar = async (
   req: express.Request,
@@ -34,40 +33,10 @@ const validateNewCar = async (
   }
 };
 
-const validateNewCarByAdmin = async (
+const validateManager = async (
   req: express.Request,
-  res: express.Response
-) => {
-  const values = ["Owner", "Car_Id", "Email"];
-  const car = req.body;
-
-  let errorList = [];
-  values.forEach((key) => {
-    if (!car[key]) {
-      errorList.push(`${key} is Required to add new car!`);
-    }
-  });
-
-  const checkCar = await Car.findOneBy({ car_ID: car.Car_Id });
-
-  if (checkCar !== null) {
-    errorList.push("This car already exist");
-  }
-
-  if (errorList.length) {
-    return res.status(401).json({
-      statusCode: 401,
-      message: "Invalid car credentials",
-      data: errorList,
-    });
-  } else {
-    return true;
-  }
-};
-
-const validateNewManagerByAdmin = async (
-  req: express.Request,
-  res: express.Response
+  res: express.Response,
+  next: express.NextFunction
 ) => {
   const values = ["Email", "Role"];
   const car = req.body;
@@ -78,25 +47,26 @@ const validateNewManagerByAdmin = async (
       errorList.push(`${key} is Required to add new car!`);
     }
   });
+  //to check if ther are no manager with the same email
+  const [test] = await Car.findAndCount({
+    relations: { role: true },
+    where: { email: car.Email, role: { roleName: In(["Manager", "Admin"]) } },
+  });
 
-  const checkCar = await Car.findOneBy({ email: car.Email });
-
-  if (checkCar !== null) {
-    // if (checkCar.role?.roleName === "Manager") {
-    errorList.push("Ther's a Manager with the same email");
-    // } else errorList.push("Change the Manger email");
+  if (test.length !== 0) {
+    errorList.push("There are a manager with the same email");
   }
 
   if (car.Role !== "Manager") errorList.push("Invalid Role");
 
-  if (errorList.length) {
+  if (errorList.length > 0) {
     return res.status(401).json({
       statusCode: 401,
       message: "Invalid manager credentials",
       data: errorList,
     });
   } else {
-    return true;
+    next();
   }
 };
 
@@ -184,8 +154,7 @@ const validateUserLogin = async (
 
 export {
   validateNewCar,
-  validateNewCarByAdmin,
   validateManagerLogin,
-  validateNewManagerByAdmin,
+  validateManager,
   validateUserLogin,
 };

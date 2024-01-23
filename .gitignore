@@ -1,6 +1,6 @@
 yarn-error.log*
 lerna-debug.log*
-
+test.js
 node_modules
 dist/
 # vscode settings
