@@ -90,9 +90,10 @@ const setPassword = async (req: express.Request, res: express.Response) => {
 
 const insertManager = async (req: express.Request, res: express.Response) => {
   try {
-    const { Email } = req.body;
+    const { Email, Name } = req.body;
     let car = new Car();
     car.email = Email;
+    car.owner = Name;
     let role = await Role.findOneBy({ roleName: "Manager" });
     if (role !== null) {
       car.role = role;

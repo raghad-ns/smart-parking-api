@@ -38,7 +38,7 @@ const validateManager = async (
   res: express.Response,
   next: express.NextFunction
 ) => {
-  const values = ["Email", "Role"];
+  const values = ["Email", "Name"];
   const car = req.body;
 
   let errorList = [];
@@ -56,8 +56,6 @@ const validateManager = async (
   if (test.length !== 0) {
     errorList.push("There are a manager with the same email");
   }
-
-  if (car.Role !== "Manager") errorList.push("Invalid Role");
 
   if (errorList.length > 0) {
     return res.status(401).json({
