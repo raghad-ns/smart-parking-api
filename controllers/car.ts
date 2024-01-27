@@ -174,10 +174,14 @@ const managerLogin = async (email: string, password: string) => {
   try {
     const [car, count] = await Car.findAndCount({
       relations: { role: true },
-      where: { email: email, role: { roleName: In(["Manager", "Admin"]) }, status: "active" },
+      where: {
+        email: email,
+        role: { roleName: In(["Manager", "Admin"]) },
+        status: "active",
+      },
     });
     console.log(car, count);
-    
+
     let x: Car = new Car();
     // for (let i = 0; i < car.length; i++) {
     //   if (car[i].email === email) {
@@ -186,13 +190,11 @@ const managerLogin = async (email: string, password: string) => {
     //   }
     // }
     x = car[0];
-    if(x.email === "" || null)
-    {
-      throw "invalid credintials"
+    if (x.email === "" || null) {
+      throw "invalid credintials";
     }
     const manager: Car = x;
-    console.log("-------------", manager);
-    
+
     const passwordMatching = await bcrypt.compare(
       password,
       manager?.password || ""

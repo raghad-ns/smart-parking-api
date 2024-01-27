@@ -12,7 +12,7 @@ const authorize = (api: string) => {
     const decoded = jwt.decode(token, { json: true });
     const car = await Car.findOneBy({ id: decoded?.userId });
     const permissions: Permission[] = car?.role?.permissions || [];
-    console.log("permissions: ", permissions);
+    console.log("permissions: ", car?.role);
     if (
       permissions.filter((p) => {
         return p.name === api;
