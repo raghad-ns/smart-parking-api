@@ -22,8 +22,11 @@ export class Connection extends BaseEntity {
   @Column()
   end_time: Date;
 
-  @Column()
+  @Column('float')
   cost: number;
+
+  @Column({ type: "enum", enum: ["inactive", "active"], default: "inactive" })
+  status: "inactive" | "active";
 
   @ManyToOne(() => Car, (user) => user.connections)
   car: Relation<Car>;
