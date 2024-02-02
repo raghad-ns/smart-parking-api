@@ -5,9 +5,11 @@ import {
   Column,
   BaseEntity,
   Entity,
+  BeforeInsert,
 } from "typeorm";
-import { Wallet } from "./Wallet.js";
-import { Reflect } from "./reflect.js";
+import bcrypt from 'bcrypt';
+import { Wallet } from "./Wallet";
+import { Reflect } from "./Reflect";
 
 @Entity()
 export class Transaction extends BaseEntity {
@@ -17,22 +19,34 @@ export class Transaction extends BaseEntity {
   @Column({ default: "Reflect" })
   type: string;
 
-  @Column()
+  @Column('float')
   amount: number;
+
+  @BeforeInsert()
+  async hashPassword() {
+    if (this.OTP) {
+      this.OTP = await bcrypt.hash(this.OTP, 10);
+    }
+  }
+  @Column("text")
+  OTP: string;
 
   @Column({
     type: "enum",
-    enum: ["Done", "Failed", "In Progress"],
-    default: "available",
+    enum: ["Done", "Failed", "In_Progress"],
+    default: "In_Progress",
   })
-  status: "Done" | "Failed" | "In Progress";
+  status: "Done" | "Failed" | "In_Progress";
 
-  @ManyToOne(() => Wallet, (wallet) => wallet.transactions)
+  @ManyToOne(() => Wallet, (wallet) => wallet.transactions, {eager: true})
   wallet: Relation<Wallet>;
 
-  @ManyToOne(() => Reflect, (reflect) => reflect.transactions)
+  @ManyToOne(() => Reflect, (reflect) => reflect.transactions, {eager: true})
   source: Relation<Reflect>;
 
   @Column("timestamp", { default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
+
+  @Column('timestamp', {default: ()=> "CURRENT_TIMESTAMP"})
+  confirmedAt: Date;
 }
