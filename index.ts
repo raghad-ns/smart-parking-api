@@ -12,7 +12,8 @@ import https from 'https';
 import parking from './routes/parking';
 import reflect from './routes/reflect';
 import transaction from './routes/transaction';
-import wallet from './routes/wallet'
+import wallet from './routes/wallet';
+import connection from './routes/connection'
 //For env File 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use('/parking', parking);
 app.use("/Reflect", reflect);
 app.use("/charge", transaction);
 app.use('/transactions', wallet);
+app.use('/simulation', connection)
 
 app.get('/', (req, res) => {
   res.send('Welcome to Express & TypeScript Server');
