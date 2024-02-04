@@ -46,11 +46,15 @@ const getWalletBalance = async (
   req: express.Request,
   res: express.Response
 ) => {
-  const token = req.headers["authorization"] || "";
-  const decoded = jwt.decode(token, { json: true });
-  const wallet = await Car.findOneBy({
-    id: decoded?.userId
-  });
-  return wallet?.wallet.amount;
+  try {
+    const token = req.headers["authorization"] || "";
+    const decoded = jwt.decode(token, { json: true });
+    const wallet = await Car.findOneBy({
+      id: decoded?.userId,
+    });
+    return wallet?.wallet.amount;
+  } catch (err) {
+    throw err;
+  }
 };
 export { getWalletTransactions, getWalletBalance };
