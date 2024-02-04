@@ -7,31 +7,59 @@ const authenticate = async (
   res: express.Response,
   next: express.NextFunction
 ) => {
-  const token = req.headers["authorization"] || "";
-  const car = await Car.findOneBy({ token: token });
-  if (car !== null) {
-    const tokenExist = car.token;
-    if (tokenExist !== "") {
-      let tokenIsValid;
-      try {
-        tokenIsValid = jwt.verify(token, process.env.PASSWORD_SECRET || "");
-      } catch (error) {}
-
-      if (tokenIsValid) {
-        const decoded = jwt.decode(token, { json: true });
-
-        if (car.id === decoded?.userId) next();
-        else res.status(400).json({statusCode: 400, message: "internal server error", data: "valid token assigned to another user"});
+  try {
+    //read the token from the request headers
+    const token = req.headers["authorization"] || "";
+    if (token !== "") {
+      //check if the token expired or not
+      const decoded = jwt.decode(token, { json: true });
+      if ((decoded as any)?.exp <= Date.now() / 1000) {
+        return res.status(401).json({
+          statusCode: 401,
+          message: "Token has expires! login again",
+          data: {},
+        });
+      } else {
+        //verify if the token has not been manipulated
+        const verify = jwt.verify(token, process.env.PASSWORD_SECRET || "");
+        if (verify) {
+          //check if ther's a car with this token in the database
+          const car = await Car.findOneBy({ token: token });
+          if (!car) {
+            return res
+              .status(401)
+              .json({ statusCode: 401, message: "Invalid Token!", data: {} });
+          } else {
+            //check if the token belong  to this user
+            if (decoded?.userId === car.id) next();
+            else {
+              return res.status(401).json({
+                statusCode: 401,
+                message: "invalid token!",
+                data: {},
+              });
+            }
+          }
+        } else {
+          return res.status(401).json({
+            statusCode: 401,
+            message: "invalid token!",
+            data: {},
+          });
+        }
       }
     } else {
-      res
+      return res
         .status(401)
         .json({ statusCode: 401, message: "You need to log in", data: {} });
     }
-  } else {
-    res
-      .status(401)
-      .json({ statusCode: 401, message: "You need to login", data: {} });
+    //handle any unexpected errors while trying to authenticate
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      data: { err },
+    });
   }
 };
 
