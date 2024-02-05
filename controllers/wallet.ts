@@ -41,4 +41,20 @@ const getWalletTransactions = async (
   }
   res.status(200).json({ statusCode: 200, message: "OK", data: test });
 };
-export default getWalletTransactions;
+
+const getWalletBalance = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const token = req.headers["authorization"] || "";
+    const decoded = jwt.decode(token, { json: true });
+    const wallet = await Car.findOneBy({
+      id: decoded?.userId,
+    });
+    return wallet?.wallet.amount;
+  } catch (err) {
+    throw err;
+  }
+};
+export { getWalletTransactions, getWalletBalance };

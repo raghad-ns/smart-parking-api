@@ -78,6 +78,42 @@ const validateNewConnection = async (
   }
 };
 
+const validateEndConnection = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  const decode = jwt.decode(req.headers["authorization"] || "", { json: true });
+  const connection = await Connection.find({
+    relations: {
+      car: true,
+    },
+    where: {
+      car: {
+        id: decode?.userId,
+      },
+      status: "active",
+    },
+  });
+  //how to deal when the car has more than one active connections?
+  if(connection.length > 1)
+  {
+    return res.status(404).json({
+      statusCode: 404,
+      message: "Not Found",
+      data: "No Active Connection Found For This User.",
+    });
+  }
+  if (!connection) {
+    
+    return res.status(404).json({
+      statusCode: 404,
+      message: "Not Found",
+      data: "No Active Connection Found For This User.",
+    });
+  } else {
+    next();
+  }
+};
 
-
-export { validateNewConnection };
+export { validateNewConnection, validateEndConnection };
