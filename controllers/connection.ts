@@ -5,7 +5,6 @@ import { Parking } from "../DB/Entities/Parking";
 import { Car } from "../DB/Entities/Car";
 import jwt from "jsonwebtoken";
 import { Wallet } from "../DB/Entities/Wallet";
-import { GetAll } from "../@types";
 
 const startConnection = async (req: express.Request, res: express.Response) => {
   try {
@@ -64,4 +63,112 @@ const startConnection = async (req: express.Request, res: express.Response) => {
   }
 };
 
-export { startConnection };
+function calculateMinutesDifference(
+  timestamp1: number,
+  timestamp2: number
+): number {
+  const date1 = new Date(timestamp1);
+  const date2 = new Date(timestamp2);
+
+  // Calculate the difference in milliseconds
+  const timeDifference = Math.abs(date2.getTime() - date1.getTime());
+
+  // Convert the difference to minutes
+  const minutesDifference = timeDifference / (1000 * 60);
+
+  return minutesDifference;
+}
+
+const charge = async (wallet: Wallet, amount: number) => {
+  const admin = await Car.findOne({
+    where: { role: { roleName: "Admin" } },
+  });
+  if (!admin) {
+    //log files
+    return {
+      statusCode: 500,
+      message: "Internal Server Error",
+      data: `Failed To charge the car for parking `,
+    };
+  }
+  const adminWallet = admin?.wallet;
+  const querryRunner = dataSource.createQueryRunner();
+  await querryRunner.connect();
+  await querryRunner.startTransaction();
+  try {
+    adminWallet.amount += amount;
+    wallet.amount -= amount;
+    await wallet.save();
+    await adminWallet.save();
+    await querryRunner.commitTransaction();
+  } catch (error) {
+    await querryRunner.rollbackTransaction();
+  } finally {
+    await querryRunner.release();
+  }
+};
+
+const endConnection = async (req: express.Request, res: express.Response) => {
+  const decode = jwt.decode(req.headers["authorization"] || "", { json: true });
+  const connection = await Connection.findOne({
+    relations: {
+      car: true,
+    },
+    where: {
+      car: {
+        id: decode?.userId,
+      },
+      status: "active",
+    },
+  });
+  if (!connection) {
+    return res.status(404).json({
+      statusCode: 404,
+      message: "Not Found",
+      data: "No Active Connection Found For This User.",
+    });
+  } else {
+    try {
+      const wallet = connection.wallet;
+      const parking = connection.parking;
+      parking.status = "available";
+      await parking.save();
+      connection.end_time = new Date();
+      let amountStr: string = (
+        calculateMinutesDifference(
+          connection.start_time.getTime(),
+          new Date().getTime()
+        ) * parseFloat(process.env.ILS_P_M || "1.0")
+      ).toFixed(2);
+      const amount: number = Number(amountStr);
+      connection.cost = amount;
+      charge(wallet, amount)
+        .then((data) => {
+          connection.status = "inactive";
+          connection.save();
+          return res.status(201).json({
+            statusCode: 200,
+            message: "Money Transfered",
+            data: "Car charged successfully :) ",
+          });
+        })
+        .catch((err) => {
+          return {
+            statusCode: 500,
+            message: "Internal Server Error",
+            data: `Failed To charge the car for parking `,
+          };
+        });
+    } catch (error) {
+      await connection.save();
+      return res.status(500).json({
+        statusCode: 500,
+        message: "Internal Server Error",
+        data: `Failed To End The Connection ${error}`,
+      });
+    }
+  }
+};
+
+
+export { startConnection, endConnection };
