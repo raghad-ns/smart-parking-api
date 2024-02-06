@@ -5,7 +5,7 @@ import { Parking } from "../DB/Entities/Parking";
 import { Car } from "../DB/Entities/Car";
 import jwt from "jsonwebtoken";
 import { Wallet } from "../DB/Entities/Wallet";
-import { GetAll } from "../@types";
+import { GetAll, hestory } from "../@types";
 
 const startConnection = async (req: express.Request, res: express.Response) => {
   try {
