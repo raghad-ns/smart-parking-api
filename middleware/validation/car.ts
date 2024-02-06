@@ -144,6 +144,13 @@ const validateUserLogin = async (
         message: "Set your password first",
         data: {},
       });
+    } else if (x.car_ID != user.Car_ID) {
+      //ensure it's case sensitive
+      res.status(404).json({
+        statusCode: 404,
+        message: "Invalid car credentials",
+        data: {},
+      });
     } else {
       next();
     }
