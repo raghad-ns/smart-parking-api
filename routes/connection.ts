@@ -8,14 +8,14 @@ import {
 } from "../middleware/validation/connection";
 import {
   endConnection,
-  getHestory,
+  getHistory,
   startConnection,
 } from "../controllers/connection";
 const router = express.Router();
 router.post(
   "/park",
   authenticate,
-  // authorize("Park"),
+  authorize("Park"),
   validateNewConnection,
   async (req, res) => {
     startConnection(req, res);
@@ -24,7 +24,7 @@ router.post(
 router.post(
   "/leave",
   authenticate,
-  // authorize("Park"),
+  authorize("Park"),
   validateEndConnection,
   async (req, res) => {
     endConnection(req, res);
@@ -32,9 +32,9 @@ router.post(
 );
 
 router.get(
-  "/hestory",
+  "/history",
   authenticate,
-  // authorize("Park"),
+  authorize("Park"),
   async (req, res) => {
     const payload = {
       page: req.query.page?.toString() || "1",
@@ -44,7 +44,7 @@ router.get(
       json: true,
     });
 
-    getHestory(req, res, payload, token?.userId)
+    getHistory(req, res, payload, token?.userId)
       .then((data) => {
         res.status(200).json({
           statusCode: 200,

@@ -171,7 +171,7 @@ const endConnection = async (req: express.Request, res: express.Response) => {
   }
 };
 
-const getHestory = async (
+const getHistory = async (
   req: express.Request,
   res: express.Response,
   payload: GetAll,
@@ -229,4 +229,4 @@ const getHestory = async (
     throw `new error fired: ${err}`;
   }
 };
-export { startConnection, endConnection, getHestory };
+export { startConnection, endConnection, getHistory };
