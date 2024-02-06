@@ -177,6 +177,56 @@ const getHestory = async (
   payload: GetAll,
   id: string
 ) => {
-  
+  try {
+    const page = parseInt(payload.page);
+    const pageSize = parseInt(payload.pageSize);
+    const [connections, total] = await Connection.findAndCount({
+      skip: pageSize * (page - 1),
+      take: pageSize,
+      order: {
+        start_time: "DESC",
+      },
+      relations: { car: true },
+      where: {
+        car: {
+          id: id,
+        },
+      },
+    });
+    
+    if (!connections || connections.length === 0) {
+      throw "car doesn't have hestory";
+    } else {
+      let hestory: hestory[] = [];
+      for (let i = 0; i < total; i++) {
+        let temp: hestory = {
+          cost: 0,
+          duration: "",
+          location: "",
+          park_At: new Date().toTimeString(),
+          leave_At: new Date().toTimeString(),
+          parking_id: 0,
+        };
+        temp.parking_id = connections[i].parking.customid;
+        temp.cost = connections[i].cost;
+        temp.park_At = connections[i].start_time.toTimeString();
+        temp.leave_At = connections[i].end_time.toTimeString();
+        temp.location = connections[i].parking.location;
+        temp.duration = `${calculateMinutesDifference(
+          connections[i].start_time.getTime(),
+          connections[i].end_time.getTime()
+        ).toFixed(2)} Minutes`;
+        hestory.push(temp);
+      }
+      return {
+        page,
+        pageSize: connections.length,
+        total,
+        hestory: hestory,
+      };
+    }
+  } catch (err) {
+    throw `new error fired: ${err}`;
+  }
 };
 export { startConnection, endConnection, getHestory };
