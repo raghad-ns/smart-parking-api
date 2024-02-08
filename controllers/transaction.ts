@@ -55,6 +55,17 @@ const chargeWallet = async (req: express.Request, res: express.Response) => {
       data: "The specified resource was not found.",
     });
   }
+  const admin_number: string =
+    process.env.ADMIN_REFLECT_MOBILE_NUMBER || "0569726909";
+  const adminReflect = await Reflect.findOneBy({ mobileNo: admin_number });
+  if (!adminReflect) {
+    logger.error("admin account in reflect is missing");
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server Error",
+      data: "admin account in reflect is missing",
+    });
+  }
   // check the otp with user entered otp
   if (await bcrypt.compare(OTP, transaction.OTP)) {
     // mark this as confirmed and save it to database
@@ -68,6 +79,10 @@ const chargeWallet = async (req: express.Request, res: express.Response) => {
 
       transaction.source.amount -= transaction.amount;
       transaction.wallet.amount += transaction.amount;
+      if (adminReflect) {
+        adminReflect.amount += transaction.amount;
+      }
+      await adminReflect?.save();
       await transaction.source.save();
       await transaction.wallet.save();
       await transaction.save();
