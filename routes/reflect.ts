@@ -3,6 +3,7 @@ import { getReflectUsers, insertReflectUser } from "../controllers/reflect";
 import { authenticate } from "../middleware/auth/authentication";
 import { authorize } from "../middleware/auth/authorization";
 import { validateReflect } from "../middleware/validation/reflect";
+import { logger, secureLog } from "../log";
 const router = express.Router();
 
 router.get("/", authenticate, authorize("GET_All_Reflect"), (req, res) => {
@@ -12,6 +13,7 @@ router.get("/", authenticate, authorize("GET_All_Reflect"), (req, res) => {
   };
   getReflectUsers(payload)
     .then((data) => {
+      secureLog("info", `${req} GET /users`);
       res.status(200).json({
         statusCode: 200,
         message: "parkings retrived",
@@ -19,6 +21,7 @@ router.get("/", authenticate, authorize("GET_All_Reflect"), (req, res) => {
       });
     })
     .catch((err) => {
+      logger.error(`Error in getting parking list : ${err}`);
       res.status(500).json({
         statusCode: 500,
         message: "Internal server error",
@@ -27,24 +30,33 @@ router.get("/", authenticate, authorize("GET_All_Reflect"), (req, res) => {
     });
 });
 
-router.post("/", authenticate, authorize("POST_Reflect"), validateReflect, (req, res) => {
-  insertReflectUser(req.body)
-    .then((data) =>
-      res.status(201).json({
-        statusCode: 201,
-        message: "new Reflect user added",
-        data: { data },
+router.post(
+  "/",
+  authenticate,
+  authorize("POST_Reflect"),
+  validateReflect,
+  (req, res) => {
+    insertReflectUser(req.body)
+      .then((data) => {
+        secureLog(
+          "info",
+          `New reflect account ${data} has been added successfully`
+        );
+        res.status(201).json({
+          statusCode: 201,
+          message: "new Reflect user added",
+          data: { data },
+        });
       })
-    )
-    .catch((err) =>
-      res
-        .status(500)
-        .json({
+      .catch((err) => {
+        logger.error(`adding new refelct account faild: ${err} `);
+        res.status(500).json({
           statusCode: 500,
           message: "Internal server error",
           data: { err },
-        })
-    );
-});
+        });
+      });
+  }
+);
 
 export default router;

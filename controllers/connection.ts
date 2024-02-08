@@ -6,6 +6,7 @@ import { Car } from "../DB/Entities/Car";
 import jwt from "jsonwebtoken";
 import { Wallet } from "../DB/Entities/Wallet";
 import { GetAll, hestory } from "../@types";
+import { logger, secureLog } from "../log";
 
 const startConnection = async (req: express.Request, res: express.Response) => {
   try {
@@ -40,12 +41,14 @@ const startConnection = async (req: express.Request, res: express.Response) => {
       connection.status = "active";
       connection.start_time = new Date();
       await connection.save();
+      secureLog("info", `new connection started successfully: ${connection}`);
       return res.status(201).json({
         statusCode: 201,
         message: "Created",
         data: "Parking reserved Successfully!",
       });
     } catch (error) {
+      logger.error(`Error in starting a connection ${error}`);
       await querryRunner.rollbackTransaction();
       return res.status(500).json({
         statusCode: 500,
@@ -56,6 +59,7 @@ const startConnection = async (req: express.Request, res: express.Response) => {
       await querryRunner.release();
     }
   } catch (err) {
+    logger.error(`An error occurred while creating a connection: ${err}`);
     return res.status(500).json({
       statusCode: 500,
       message: "Internal Server Error",
@@ -86,6 +90,7 @@ const charge = async (wallet: Wallet, amount: number) => {
   });
   if (!admin) {
     //log files
+    logger.error(`Admin user not found`)
     return {
       statusCode: 500,
       message: "Internal Server Error",
@@ -102,7 +107,9 @@ const charge = async (wallet: Wallet, amount: number) => {
     await wallet.save();
     await adminWallet.save();
     await querryRunner.commitTransaction();
+    secureLog("info", `Successfully charged ${amount}$ from car to admin`);
   } catch (error) {
+    logger.error(`Error while charging ${error}`);
     await querryRunner.rollbackTransaction();
   } finally {
     await querryRunner.release();
@@ -123,6 +130,7 @@ const endConnection = async (req: express.Request, res: express.Response) => {
     },
   });
   if (!connection) {
+    secureLog("info", `trying to end connection: No active connection found for user with ID :${decode?.userId}`);
     return res.status(404).json({
       statusCode: 404,
       message: "Not Found",
@@ -154,6 +162,7 @@ const endConnection = async (req: express.Request, res: express.Response) => {
           });
         })
         .catch((err) => {
+          logger.error(`Error in charging the user : ${err}`);
           return {
             statusCode: 500,
             message: "Internal Server Error",
@@ -162,6 +171,7 @@ const endConnection = async (req: express.Request, res: express.Response) => {
         });
     } catch (error) {
       await connection.save();
+      logger.error(`Error In End Parking Session : ${error}`);
       return res.status(500).json({
         statusCode: 500,
         message: "Internal Server Error",

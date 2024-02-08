@@ -3,6 +3,7 @@ lerna-debug.log*
 test.js
 node_modules
 dist/
+logs
 # vscode settings
 .vscode
 

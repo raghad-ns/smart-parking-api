@@ -2,13 +2,14 @@ import express from "express";
 import { Permission } from "../../DB/Entities/Permission";
 import jwt from "jsonwebtoken";
 import { Car } from "../../DB/Entities/Car";
+import { secureLog } from "../../log";
 const authorize = (api: string) => {
   return async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) => {
-    const token = req.headers["authorization"] || "";  
+    const token = req.headers["authorization"] || "";
     const decoded = jwt.decode(token, { json: true });
     const car = await Car.findOneBy({ id: decoded?.userId });
     const permissions: Permission[] = car?.role?.permissions || [];
@@ -20,13 +21,12 @@ const authorize = (api: string) => {
     ) {
       next();
     } else {
-      res
-        .status(403)
-        .json({
-          statusCode: 403,
-          message: "you don't have the permission to access this resource!",
-          data: {},
-        });
+      secureLog("info", `Unauthorized access to ${req.url}`);
+      res.status(403).json({
+        statusCode: 403,
+        message: "you don't have the permission to access this resource!",
+        data: {},
+      });
     }
   };
 };

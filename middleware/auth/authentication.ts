@@ -1,6 +1,7 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import { Car } from "../../DB/Entities/Car";
+import { logger, secureLog } from "../../log";
 
 const authenticate = async (
   req: express.Request,
@@ -14,6 +15,7 @@ const authenticate = async (
       //check if the token expired or not
       const decoded = jwt.decode(token, { json: true });
       if ((decoded as any)?.exp <= Date.now() / 1000) {
+        secureLog("info", `login with expired token`);
         return res.status(401).json({
           statusCode: 401,
           message: "Token has expires! login again",
@@ -26,6 +28,7 @@ const authenticate = async (
           //check if ther's a car with this token in the database
           const car = await Car.findOneBy({ token: token });
           if (!car) {
+            secureLog("info", `token belongs to unexisted car ${token}`);
             return res
               .status(401)
               .json({ statusCode: 401, message: "Invalid Token!", data: {} });
@@ -33,6 +36,10 @@ const authenticate = async (
             //check if the token belong  to this user
             if (decoded?.userId === car.id) next();
             else {
+              secureLog(
+                "info",
+                `trying to sign in with out being care about case sensetivity`
+              );
               return res.status(401).json({
                 statusCode: 401,
                 message: "invalid token!",
@@ -41,6 +48,7 @@ const authenticate = async (
             }
           }
         } else {
+          logger.error(`JWT Verification failed: ${token}`);
           return res.status(401).json({
             statusCode: 401,
             message: "invalid token!",

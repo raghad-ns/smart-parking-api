@@ -4,6 +4,7 @@ import {
   checkPasswordStrength,
   passwordMatched,
 } from "../../controllers/password";
+import { logger } from "../../log";
 const validateReflect = async (
   req: express.Request,
   res: express.Response,
@@ -41,6 +42,7 @@ const validateReflect = async (
   }
 
   if (errorList.length > 0) {
+    logger.error(`Reflect Validation Errors : ${JSON.stringify(errorList)} `);
     return res.status(401).json({
       statusCode: 401,
       message: "Invalid Reflect credentials",
