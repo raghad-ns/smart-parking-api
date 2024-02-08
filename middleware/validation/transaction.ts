@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { Reflect } from "../../DB/Entities/Reflect";
 import { Transaction } from "../../DB/Entities/Transaction";
 import { FindOperator } from "typeorm";
+import { logger, secureLog } from "../../log";
 const validateTransaction = async (
   req: express.Request,
   res: express.Response,
@@ -26,6 +27,7 @@ const validateTransaction = async (
     errorList.push("Password must be at least 8 characters long");
   }
   if (errorList.length > 0) {
+    secureLog("info", `invalid credintials to start transaction: ${errorList}`);
     return res
       .status(400)
       .json({ statusCode: 400, message: "Bad Request", data: errorList });
@@ -58,29 +60,29 @@ const validateTransaction = async (
         status: "In_Progress",
         source: {
           mobileNo: reflect?.mobileNo,
-          id: reflect.id
+          id: reflect.id,
         },
       },
     });
-console.log(test);
 
-    if(test.length > 0)
-    {
+    if (test.length > 0) {
+      secureLog(
+        "info",
+        `strat new transaction while the user has unclosed one`
+      );
       return res
-      .status(400)
-      .json({ statusCode: 400, message: "unclosed transaction", data: "there is In_Progress transaction needs to be handeled" })
-      .send();
+        .status(400)
+        .json({
+          statusCode: 400,
+          message: "unclosed transaction",
+          data: "there is In_Progress transaction needs to be handeled",
+        })
+        .send();
     }
   }
 
-  // const x = reflect?.transactions;
-  // const test = x?.filter((st) => st.status === "In_Progress");
-  // if (test?.length !== 0) {
-  //   errorList.push("You need to deal with unconfirmed transactions");
-  // }
-
-
   if (errorList.length > 0) {
+    secureLog("info", `invalid credintials to start transaction: ${errorList}`);
     return res
       .status(400)
       .json({ statusCode: 400, message: "Bad Request", data: errorList })
@@ -96,6 +98,7 @@ const confirmTransaction = async (
   next: express.NextFunction
 ) => {
   if (!req.params.id) {
+    secureLog("info", `confirming transaction whithout id `);
     return res.status(400).json({
       statusCode: 400,
       message: "Bad Request",
@@ -105,6 +108,10 @@ const confirmTransaction = async (
   const transaction = await Transaction.findOneBy({ id: req.params.id });
 
   if (transaction === null) {
+    secureLog(
+      "info",
+      `unknown transaction tried to be confirmed: ${req.params.id}`
+    );
     return res.status(404).json({
       statusCode: 404,
       message: "Invalid transaction",
@@ -112,6 +119,9 @@ const confirmTransaction = async (
     });
   }
   if (transaction.status === "Done" || transaction.status === "Failed") {
+    logger.error(
+      `attempted to confirm a already completed transaction :${req.params.id}`
+    );
     return res.status(400).json({
       statusCode: 400,
       message: "Bad Request",
@@ -119,6 +129,7 @@ const confirmTransaction = async (
     });
   }
   if (!req.body.OTP) {
+    logger.error(`No OTP provided for transaction ID: ${req.params.id}`);
     return res.status(400).json({
       statusCode: 400,
       message: "Bad Request",

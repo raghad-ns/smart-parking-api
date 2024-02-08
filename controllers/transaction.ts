@@ -4,6 +4,7 @@ import { Transaction } from "../DB/Entities/Transaction";
 import { Reflect } from "../DB/Entities/Reflect";
 import { Car } from "../DB/Entities/Car";
 import dataSource from "../DB/dataSource";
+import { secureLog, logger } from "../log";
 const startTransaction = async (
   req: express.Request,
   res: express.Response
@@ -12,6 +13,7 @@ const startTransaction = async (
   const source = await Reflect.findOneBy({ mobileNo: req.body.mobileNo });
   const car = await Car.findOneBy({ car_ID: req.body.carId });
   if (!source || !car) {
+    secureLog("info", `Transfer money to unexisted car ${req.body}`);
     return res.status(401).send("Invalid User or Car");
   } else {
     try {
@@ -24,10 +26,14 @@ const startTransaction = async (
       const otp = generateOTP();
       transaction.OTP = otp;
       await transaction.save();
-      return {ID: transaction.id, OTP: otp};
+      return { ID: transaction.id, OTP: otp };
     } catch (error) {
-      console.log("Error in /api/transaction/charge-wallet : ", error);
-      return res.status(500).json({statusCode: 500, message:`Internal Server Error`, data: error});
+      logger.error(`Error in /api/transaction/charge-wallet : ${error}`);
+      return res.status(500).json({
+        statusCode: 500,
+        message: `Internal Server Error`,
+        data: error,
+      });
     }
   }
 };
@@ -42,6 +48,7 @@ const chargeWallet = async (req: express.Request, res: express.Response) => {
   const OTP = req.body.OTP;
   const transaction = await Transaction.findOneBy({ id: req.params.id });
   if (!transaction) {
+    secureLog("info", `Transaction not found with ID ${req.params.id}`);
     return res.status(404).json({
       statusCode: 404,
       message: "Not Found",
@@ -58,34 +65,38 @@ const chargeWallet = async (req: express.Request, res: express.Response) => {
     await querryRunner.startTransaction();
     try {
       transaction.status = "Done";
-      
+
       transaction.source.amount -= transaction.amount;
       transaction.wallet.amount += transaction.amount;
       await transaction.source.save();
       await transaction.wallet.save();
       await transaction.save();
       await querryRunner.commitTransaction();
-      return res
-        .status(201)
-        .json({
-          statusCode: 201,
-          message: "Created",
-          data: "Transaction Confirmed Successfully!",
-        });
+      secureLog(
+        "info",
+        `Charge wallet of User with wallet ID ${transaction.wallet.id} with ${transaction.amount} successfully`
+      );
+      return res.status(201).json({
+        statusCode: 201,
+        message: "Created",
+        data: "Transaction Confirmed Successfully!",
+      });
     } catch (error) {
       await querryRunner.rollbackTransaction();
-      return res
-        .status(500)
-        .json({
-          statusCode: 500,
-          message: "Internal Server Error",
-          data: `Failed To Save The Transaction ${error}`,
-        });
+      logger.error(`Internal server error in confirming transaction: ${error}`);
+      return res.status(500).json({
+        statusCode: 500,
+        message: "Internal Server Error",
+        data: `Failed To Save The Transaction ${error}`,
+      });
     } finally {
       await querryRunner.release();
     }
-
   } else {
+    secureLog(
+      "info",
+      `Transaction caneled: invalid OTP intered with ID: ${req.params.id}`
+    );
     transaction.status = "Failed";
     transaction.confirmedAt = new Date();
     await transaction.save();

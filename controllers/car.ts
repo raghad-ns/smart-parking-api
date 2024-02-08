@@ -6,6 +6,7 @@ import { passwordMatched } from "./password";
 import { Role } from "../DB/Entities/Role";
 import { Wallet } from "../DB/Entities/Wallet";
 import { In } from "typeorm";
+import { logger, secureLog } from "../log";
 
 const insertCar = async (req: express.Request, res: express.Response) => {
   try {
@@ -98,6 +99,7 @@ const insertManager = async (req: express.Request, res: express.Response) => {
     if (role !== null) {
       car.role = role;
     } else {
+      logger.error(`Manager role dosen't exist`);
       res.status(400).json({
         statusCode: 400,
         message: "Error adding Manager while finding the role",
@@ -114,12 +116,14 @@ const insertManager = async (req: express.Request, res: express.Response) => {
     console.log("insert manager");
 
     const link = `https://localhost:${process.env.PORT}/home/set-manager-password/${car.email}/${token}`;
+    secureLog("info", `new manager  added with email ${Email} and send a mail to set password : ${link}`);
     res.status(201).json({
       statusCode: 201,
       message: "Manager added successfully",
       data: { manager: car, passwordLink: link },
     });
   } catch (error) {
+    logger.error(`Internal server error while adding new manager: ${error}`)
     res.status(500).json({
       statusCode: 500,
       message: `Internal server Error: ${error}`,

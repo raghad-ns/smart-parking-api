@@ -12,6 +12,9 @@ if (!fs.existsSync(logsDirectory)) {
 // Encryption key (replace this with your own secret key)
 const encryptionKey = "YourSecretEncryptionKey";
 
+// Decryption key (should match the encryption key)
+const decryptionKey = 'YourSecretEncryptionKey';
+
 // Define a custom format for the logs
 const logFormat = winston.format.combine(
   winston.format.timestamp(),
@@ -52,7 +55,7 @@ const logger = winston.createLogger({
 function secureLog(level: string, message: string, meta?: Record<string, any>) {
   // Add any additional security checks or redaction logic here
   // Encrypt the log message
-  const cipher = crypto.createCipher("aes-256-cbc", encryptionKey);
+  const cipher = crypto.createCipher("aes-256-ctr", encryptionKey);
   let encryptedMessage = cipher.update(message, "utf-8", "hex");
   encryptedMessage += cipher.final("hex");
 
@@ -62,27 +65,18 @@ function secureLog(level: string, message: string, meta?: Record<string, any>) {
     message: encryptedMessage,
     meta,
   });
+};
+
+// Secure decryption function
+function secureDecrypt(encryptedMessage: string): string {
+  // Decrypt the message
+  const decipher = crypto.createDecipher('aes-256-ctr', decryptionKey);
+  let decryptedMessage = decipher.update(encryptedMessage, 'hex', 'utf-8');
+  decryptedMessage += decipher.final('utf-8');
+  
+  return decryptedMessage;
 }
 
-// // Define a custom format for the logs
-// const logFormat = winston.format.combine(
-//     winston.format.timestamp(),
-//     winston.format.json()
-//   );
+export {logger, secureLog, secureDecrypt}
 
-// const baseLogger = winston.createLogger({
-//   format: logFormat,
-//   defaultMeta: { project: "Smart Parking System" },
-//   transports: [
-//     new winston.transports.File({
-//       filename: "./logs/error.log",
-//       level: "error",
-//     }),
-//     new winston.transports.File({ filename: "./logs/all.log", level: "info" }),
-//     new winston.transports.Console({ format: winston.format.simple() }),
-//     new winston.transports.File({
-//       filename: "./logs/moneyTransfer.log",
-//       level: "Money",
-//     }),
-//   ],
-// });
+
