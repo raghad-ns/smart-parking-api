@@ -10,10 +10,10 @@ if (!fs.existsSync(logsDirectory)) {
 }
 
 // Encryption key (replace this with your own secret key)
-const encryptionKey = "YourSecretEncryptionKey";
+const encryptionKey = process.env.ENCRYPTION_KEY || "YourSecretEncryptionKey";
 
 // Decryption key (should match the encryption key)
-const decryptionKey = 'YourSecretEncryptionKey';
+const decryptionKey = process.env.DECRYPTION_KEY || "YourSecretEncryptionKey";
 
 // Define a custom format for the logs
 const logFormat = winston.format.combine(
@@ -43,9 +43,9 @@ const logger = winston.createLogger({
       level: "info",
     }),
     new winston.transports.File({
-        filename: "./logs/moneyTransfer.log",
-        format: logFormat,
-        level: "money",
+      filename: "./logs/moneyTransfer.log",
+      format: logFormat,
+      level: "money",
     }),
     new winston.transports.Console({ format: winston.format.simple() }),
   ],
@@ -65,18 +65,16 @@ function secureLog(level: string, message: string, meta?: Record<string, any>) {
     message: encryptedMessage,
     meta,
   });
-};
+}
 
 // Secure decryption function
 function secureDecrypt(encryptedMessage: string): string {
   // Decrypt the message
-  const decipher = crypto.createDecipher('aes-256-ctr', decryptionKey);
-  let decryptedMessage = decipher.update(encryptedMessage, 'hex', 'utf-8');
-  decryptedMessage += decipher.final('utf-8');
-  
+  const decipher = crypto.createDecipher("aes-256-ctr", decryptionKey);
+  let decryptedMessage = decipher.update(encryptedMessage, "hex", "utf-8", );
+  decryptedMessage += decipher.final("utf-8");
+
   return decryptedMessage;
 }
 
-export {logger, secureLog, secureDecrypt}
-
-
+export { logger, secureLog, secureDecrypt };
