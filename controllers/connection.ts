@@ -143,6 +143,7 @@ const endConnection = async (req: express.Request, res: express.Response) => {
     try {
       const wallet = connection.wallet;
       const parking = connection.parking;
+      const minuteCost = parseFloat(process.env.ILS_P_M || "1.0");
       parking.status = "available";
       await parking.save();
       connection.end_time = new Date();
@@ -150,7 +151,7 @@ const endConnection = async (req: express.Request, res: express.Response) => {
         calculateMinutesDifference(
           connection.start_time.getTime(),
           new Date().getTime()
-        ) * parseFloat(process.env.ILS_P_M || "1.0")
+        ) * minuteCost
       ).toFixed(2);
       const amount: number = Number(amountStr);
       connection.cost = amount;
