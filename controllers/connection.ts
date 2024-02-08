@@ -219,16 +219,22 @@ const getHistory = async (
           park_At: new Date().toTimeString(),
           leave_At: new Date().toTimeString(),
           parking_id: 0,
+          status: "inactive",
         };
         temp.parking_id = i.parking.customid;
         temp.cost = i.cost;
         temp.park_At = i.start_time.toTimeString();
-        temp.leave_At = i.end_time.toTimeString();
+        i.status === "active"
+          ? delete temp.leave_At
+          : (temp.leave_At = i.end_time.toTimeString());
         temp.location = i.parking.location;
-        temp.duration = `${calculateMinutesDifference(
-          i.start_time.getTime(),
-          i.end_time.getTime()
-        ).toFixed(2)} Minutes`;
+        temp.status = i.status;
+        i.status === "active"
+          ? delete temp.cost
+          : (temp.duration = `${calculateMinutesDifference(
+              i.start_time.getTime(),
+              i.end_time.getTime()
+            ).toFixed(2)} Minutes`);
         hestory.push(temp);
       });
       return {
