@@ -3,6 +3,8 @@ import { Role } from "../DB/Entities/Role";
 import { Permission } from "../DB/Entities/Permission";
 import { Car } from "../DB/Entities/Car";
 import { Wallet } from "../DB/Entities/Wallet";
+import { Reflect } from "../DB/Entities/Reflect";
+import { env } from "process";
 
 export class AdminRolesMigration1701638913517 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -63,6 +65,13 @@ export class AdminRolesMigration1701638913517 implements MigrationInterface {
     await Manager.save();
     //update role permission
     Admin.permissions = [...Admin.permissions, postRe, getRe]
+    //create admin reflect accont
+    const reflect = new Reflect()
+    reflect.mobileNo = env.ADMIN_REFLECT_MOBILE_NUMBER || "0569726909";
+    reflect.password = "123moh2Ml";
+    reflect.owner = "Smart Parking System";
+    await reflect.save()
+
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
