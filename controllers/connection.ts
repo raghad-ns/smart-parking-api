@@ -90,7 +90,7 @@ const charge = async (wallet: Wallet, amount: number) => {
   });
   if (!admin) {
     //log files
-    logger.error(`Admin user not found`)
+    logger.error(`Admin user not found`);
     return {
       statusCode: 500,
       message: "Internal Server Error",
@@ -130,7 +130,10 @@ const endConnection = async (req: express.Request, res: express.Response) => {
     },
   });
   if (!connection) {
-    secureLog("info", `trying to end connection: No active connection found for user with ID :${decode?.userId}`);
+    secureLog(
+      "info",
+      `trying to end connection: No active connection found for user with ID :${decode?.userId}`
+    );
     return res.status(404).json({
       statusCode: 404,
       message: "Not Found",
@@ -203,12 +206,11 @@ const getHistory = async (
         },
       },
     });
-    
     if (!connections || connections.length === 0) {
       throw "car doesn't have hestory";
     } else {
       let hestory: hestory[] = [];
-      for (let i = 0; i < total; i++) {
+      connections.forEach((connection) => {
         let temp: hestory = {
           cost: 0,
           duration: "",
@@ -217,17 +219,17 @@ const getHistory = async (
           leave_At: new Date().toTimeString(),
           parking_id: 0,
         };
-        temp.parking_id = connections[i].parking.customid;
-        temp.cost = connections[i].cost;
-        temp.park_At = connections[i].start_time.toTimeString();
-        temp.leave_At = connections[i].end_time.toTimeString();
-        temp.location = connections[i].parking.location;
+        temp.parking_id = connection.parking.customid;
+        temp.cost = connection.cost;
+        temp.park_At = connection.start_time.toTimeString();
+        temp.leave_At = connection.end_time.toTimeString();
+        temp.location = connection.parking.location;
         temp.duration = `${calculateMinutesDifference(
-          connections[i].start_time.getTime(),
-          connections[i].end_time.getTime()
+          connection.start_time.getTime(),
+          connection.end_time.getTime()
         ).toFixed(2)} Minutes`;
         hestory.push(temp);
-      }
+      });
       return {
         page,
         pageSize: connections.length,
