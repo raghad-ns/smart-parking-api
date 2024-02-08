@@ -32,7 +32,7 @@ router.post(
   }
 );
 
-router.get("/history", authenticate, authorize("Park"), async (req, res) => {
+router.get("/history", authenticate, async (req, res) => {
   const payload = {
     page: req.query.page?.toString() || "1",
     pageSize: req.query.pageSize?.toString() || "6",
