@@ -206,11 +206,12 @@ const getHistory = async (
         },
       },
     });
+
     if (!connections || connections.length === 0) {
-      throw "car doesn't have hestory";
+      return {};
     } else {
       let hestory: hestory[] = [];
-      connections.forEach((connection) => {
+      connections.forEach((i) => {
         let temp: hestory = {
           cost: 0,
           duration: "",
@@ -219,14 +220,14 @@ const getHistory = async (
           leave_At: new Date().toTimeString(),
           parking_id: 0,
         };
-        temp.parking_id = connection.parking.customid;
-        temp.cost = connection.cost;
-        temp.park_At = connection.start_time.toTimeString();
-        temp.leave_At = connection.end_time.toTimeString();
-        temp.location = connection.parking.location;
+        temp.parking_id = i.parking.customid;
+        temp.cost = i.cost;
+        temp.park_At = i.start_time.toTimeString();
+        temp.leave_At = i.end_time.toTimeString();
+        temp.location = i.parking.location;
         temp.duration = `${calculateMinutesDifference(
-          connection.start_time.getTime(),
-          connection.end_time.getTime()
+          i.start_time.getTime(),
+          i.end_time.getTime()
         ).toFixed(2)} Minutes`;
         hestory.push(temp);
       });

@@ -26,19 +26,19 @@ const getWalletTransactions = async (
   });
   //changing the form of wallet transactions
   let test: Transactions[] = [];
-  for (let i = 0; i < total; i++) {
+  transactions.forEach(i =>  {
     let data: Transactions = {
       balance: 0,
       confirmed: new Date(),
       from: "",
       type: "",
     };
-    data.balance = transactions[i].amount;
-    data.confirmed = transactions[i].confirmedAt;
-    data.from = transactions[i].source.mobileNo;
-    data.type = transactions[i].type;
+    data.balance = i.amount;
+    data.confirmed = i.confirmedAt;
+    data.from = i.source.mobileNo;
+    data.type = i.type;
     test.push(data);
-  }
+  })
   return test;
 };
 
