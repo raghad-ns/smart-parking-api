@@ -7,6 +7,26 @@ import { Role } from "../DB/Entities/Role";
 import { Wallet } from "../DB/Entities/Wallet";
 import { In } from "typeorm";
 import { logger, secureLog } from "../log";
+import { user } from "../@types";
+import { Connection } from "../DB/Entities/Connection";
+
+const user = (car: Car): user => {
+  const parking: Connection[] | null = car.connections.filter((conn) => {
+    if (conn.status === "active") return conn;
+  });
+  let user: user = {
+    carID: car.car_ID ? car.car_ID : null,
+    wallet: {
+      id: car.wallet ? car.wallet.id : null,
+      amount: car.wallet ? car.wallet.amount : null,
+    },
+    connection: parking.length > 0 ? parking[0] : null,
+    role: { roleName: car.role.roleName },
+    token: car.token ? car.token : null,
+  };
+
+  return user;
+};
 
 const insertCar = async (req: express.Request, res: express.Response) => {
   try {
@@ -116,14 +136,17 @@ const insertManager = async (req: express.Request, res: express.Response) => {
     console.log("insert manager");
 
     const link = `https://localhost:${process.env.PORT}/home/set-manager-password/${car.email}/${token}`;
-    secureLog("info", `new manager  added with email ${Email} and send a mail to set password : ${link}`);
+    secureLog(
+      "info",
+      `new manager  added with email ${Email} and send a mail to set password : ${link}`
+    );
     res.status(201).json({
       statusCode: 201,
       message: "Manager added successfully",
       data: { manager: car, passwordLink: link },
     });
   } catch (error) {
-    logger.error(`Internal server error while adding new manager: ${error}`)
+    logger.error(`Internal server error while adding new manager: ${error}`);
     res.status(500).json({
       statusCode: 500,
       message: `Internal server Error: ${error}`,
@@ -184,15 +207,7 @@ const managerLogin = async (email: string, password: string) => {
         status: "active",
       },
     });
-    console.log(car, count);
-
     let x: Car = new Car();
-    // for (let i = 0; i < car.length; i++) {
-    //   if (car[i].email === email) {
-    //     x = car[i];
-    //     break;
-    //   }
-    // }
     x = car[0];
     if (x.email === "" || null) {
       throw "invalid credintials";
@@ -256,4 +271,5 @@ export {
   setManagerPassword,
   managerLogin,
   userLogin,
+  user
 };

@@ -11,6 +11,7 @@ import {
   managerLogin,
   setManagerPassword,
   setPassword,
+  user,
   userLogin,
 } from "../controllers/car";
 import { authenticate } from "../middleware/auth/authentication";
@@ -44,7 +45,9 @@ router.post("/user/signin", validateUserLogin, (req, res) => {
   userLogin(Car_ID, Password)
     .then((data) => {
       secureLog("info", `new user login: ${data}`);
-      res.status(200).json({ statusCode: 200, message: "Ok", data: data });
+      res
+        .status(200)
+        .json({ statusCode: 200, message: "Ok", data: user(data.car) });
     })
     .catch((err) => {
       logger.error(`Error while user sign in: ${err}`);
@@ -70,7 +73,9 @@ router.post("/manager/signin", validateManagerLogin, (req, res) => {
         "info",
         `The manager with email: ${Email} has set his password successfully: ${data}`
       );
-      res.status(200).json({ statusCode: 200, message: "Ok", data: data });
+      res
+        .status(200)
+        .json({ statusCode: 200, message: "Ok", data: user(data.car) });
     })
     .catch((err) => {
       logger.error(`Erron while manager login: ${err}`);
