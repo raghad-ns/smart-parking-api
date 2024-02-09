@@ -8,14 +8,63 @@ import { env } from "process";
 
 export class AdminRolesMigration1701638913517 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    //admin permission
-    const admin = new Permission();
-    admin.name = "Admin";
-    await admin.save();
+    //Post_car
+    const POST_Car = new Permission();
+    POST_Car.name = "POST_Car";
+    await POST_Car.save();
+    //Post_manager
+    const POST_Manager = new Permission();
+    POST_Car.name = "POST_Manager";
+    await POST_Manager.save();
+    //post connection
+    const POST_Connection = new Permission();
+    POST_Connection.name = "POST_Connection";
+    await POST_Connection.save();
+    //get connection
+    const GET_Connection = new Permission();
+    GET_Connection.name = "GET_Connection";
+    await GET_Connection.save();
+    //post parking
+    const POST_Parking = new Permission();
+    POST_Parking.name = "POST_Parking";
+    await POST_Parking.save();
+    //get parking
+    const GET_Parking = new Permission();
+    GET_Parking.name = "GET_Parking";
+    await GET_Parking.save();
+    //get reflect
+    const GET_Reflect = new Permission();
+    GET_Reflect.name = "GET_Reflect";
+    await GET_Reflect.save();
+    //post reflect
+    const POST_Reflect = new Permission();
+    POST_Reflect.name = "POST_Reflect";
+    //post transaction
+    const POST_Transaction = new Permission();
+    POST_Transaction.name = "POST_Transaction";
+    await POST_Transaction.save();
+    //get transaction
+    const GET_Transaction = new Permission();
+    GET_Transaction.name = "GET_Transaction";
+    await GET_Transaction.save();
+    //get balance
+    const GET_Balance = new Permission();
+    GET_Balance.name = "GET_Balance";
+    await GET_Balance.save();
+    //User Role
+    const user = new Role();
+    user.roleName = "User";
+    user.permissions = [POST_Connection, GET_Connection, GET_Parking, POST_Transaction, GET_Transaction, GET_Balance];
+    await user.save();
+    //Manager Role
+    const manager = new Role();
+    manager.roleName = "Manager";
+    manager.permissions = [POST_Car, POST_Parking];
+    await manager.save();
     //admin Role
     const Admin = new Role();
     Admin.roleName = "Admin";
-    Admin.permissions = [admin];
+    Admin.permissions = [POST_Car, POST_Manager, POST_Parking, GET_Reflect, POST_Reflect];
     await Admin.save();
 
     //admin User
@@ -28,43 +77,6 @@ export class AdminRolesMigration1701638913517 implements MigrationInterface {
     AdminUser.wallet = new Wallet();
     await AdminUser.wallet.save();
     await AdminUser.save();
-//car permissions
-    const x = new Permission();
-    x.name = "POST_car";
-    await x.save()
-
-    //parking permissions
-    const getPark = new Permission();
-    getPark.name = "GET_parkings";
-    await getPark.save()
-
-    const postPark = new Permission();
-    postPark.name = "POST_parking";
-    await postPark.save();
-
-    //reflect permissions
-    const postRe = new Permission();
-    postRe.name = "POST_Reflect";
-    await postRe.save();
-    const getRe = new Permission();
-    getRe.name = "GET_ALL_Reflect";
-    await getRe.save();
-    //transaction permission
-    const getTran = new Permission ();
-    getTran.name = "GET_Transaction";
-    await getTran.save();
-    //user Role
-    const user = new Role();
-    user.roleName = "User";
-    user.permissions = [getPark, getTran];
-    await user.save();
-    //manager Role
-    const Manager = new Role();
-    Manager.roleName = "Manager";
-    Manager.permissions = [x, postPark];
-    await Manager.save();
-    //update role permission
-    Admin.permissions = [...Admin.permissions, postRe, getRe]
     //create admin reflect accont
     const reflect = new Reflect()
     reflect.mobileNo = env.ADMIN_REFLECT_MOBILE_NUMBER || "0569726909";

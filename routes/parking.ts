@@ -10,7 +10,7 @@ const router = express.Router();
 router.post(
   "",
   authenticate,
-  authorize("POST_parking"),
+  authorize("POST_Parking"),
   validateNewParking,
   (req, res) => {
     insertParking(req.body)
@@ -33,7 +33,7 @@ router.post(
   }
 );
 
-router.get("/", authenticate, authorize("GET_parkings"), (req, res) => {
+router.get("/", authenticate, authorize("GET_Parking"), (req, res) => {
   const payload = {
     page: req.query.page?.toString() || "1",
     pageSize: req.query.pageSize?.toString() || "10",
