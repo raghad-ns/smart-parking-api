@@ -23,7 +23,7 @@ const router = express.Router();
 router.post(
   "/signup",
   authenticate,
-  authorize("POST_car"),
+  authorize("POST_Car"),
   validateNewCar,
   (req, res) => {
     try {
@@ -55,7 +55,7 @@ router.post("/user/signin", validateUserLogin, (req, res) => {
 router.post(
   "/manager/signup",
   authenticate,
-  authorize("Admin"),
+  authorize("POST_Manager"),
   validateManager,
   async (req, res) => {
     insertManager(req, res);

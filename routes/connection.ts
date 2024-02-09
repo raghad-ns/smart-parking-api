@@ -16,23 +16,24 @@ const router = express.Router();
 router.post(
   "/park",
   authenticate,
-  authorize("Park"),
+  authorize("POST_Connection"),
   validateNewConnection,
   async (req, res) => {
     startConnection(req, res);
   }
 );
+
 router.post(
   "/leave",
   authenticate,
-  authorize("Park"),
+  authorize("POST_Connection"),
   validateEndConnection,
   async (req, res) => {
     endConnection(req, res);
   }
 );
 
-router.get("/history", authenticate, async (req, res) => {
+router.get("/history", authenticate, authorize("GET_Connection"), async (req, res) => {
   const payload = {
     page: req.query.page?.toString() || "1",
     pageSize: req.query.pageSize?.toString() || "6",
