@@ -1,3 +1,5 @@
+import { Connection } from "../DB/Entities/Connection";
+
 export interface GetAll {
   page: string;
   pageSize: string;
@@ -18,4 +20,12 @@ export interface hestory {
   duration: string;
   cost?: number;
   status: "active" | "inactive";
+}
+
+export interface user {
+  carID: string | null,
+  wallet: {id: string|null, amount: number|null},
+  connection: Connection | null,
+  role: {roleName: string|null},
+  token: string|null,
 }
