@@ -18,7 +18,8 @@ export interface hestory {
   park_At: string;
   leave_At?: string;
   duration: string;
-  cost: number;
+  cost?: number;
+  status: "active" | "inactive";
 }
 
 export interface user {

@@ -6,7 +6,7 @@ import { validateReflect } from "../middleware/validation/reflect";
 import { logger, secureLog } from "../log";
 const router = express.Router();
 
-router.get("/", authenticate, authorize("GET_All_Reflect"), (req, res) => {
+router.get("/", authenticate, authorize("GET_Reflect"), (req, res) => {
   const payload = {
     page: req.query.page?.toString() || "1",
     pageSize: req.query.pageSize?.toString() || "10",

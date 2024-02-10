@@ -143,6 +143,7 @@ const endConnection = async (req: express.Request, res: express.Response) => {
     try {
       const wallet = connection.wallet;
       const parking = connection.parking;
+      const minuteCost = parseFloat(process.env.ILS_P_M || "1.0");
       parking.status = "available";
       await parking.save();
       connection.end_time = new Date();
@@ -150,7 +151,7 @@ const endConnection = async (req: express.Request, res: express.Response) => {
         calculateMinutesDifference(
           connection.start_time.getTime(),
           new Date().getTime()
-        ) * parseFloat(process.env.ILS_P_M || "1.0")
+        ) * minuteCost
       ).toFixed(2);
       const amount: number = Number(amountStr);
       connection.cost = amount;
@@ -219,16 +220,22 @@ const getHistory = async (
           park_At: new Date().toTimeString(),
           leave_At: new Date().toTimeString(),
           parking_id: 0,
+          status: "inactive",
         };
         temp.parking_id = i.parking.customid;
         temp.cost = i.cost;
         temp.park_At = i.start_time.toTimeString();
-        temp.leave_At = i.end_time.toTimeString();
+        i.status === "active"
+          ? delete temp.leave_At
+          : (temp.leave_At = i.end_time.toTimeString());
         temp.location = i.parking.location;
-        temp.duration = `${calculateMinutesDifference(
-          i.start_time.getTime(),
-          i.end_time.getTime()
-        ).toFixed(2)} Minutes`;
+        temp.status = i.status;
+        i.status === "active"
+          ? delete temp.cost
+          : (temp.duration = `${calculateMinutesDifference(
+              i.start_time.getTime(),
+              i.end_time.getTime()
+            ).toFixed(2)} Minutes`);
         hestory.push(temp);
       });
       return {
