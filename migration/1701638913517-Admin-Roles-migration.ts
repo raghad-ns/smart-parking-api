@@ -14,7 +14,7 @@ export class AdminRolesMigration1701638913517 implements MigrationInterface {
     await POST_Car.save();
     //Post_manager
     const POST_Manager = new Permission();
-    POST_Car.name = "POST_Manager";
+    POST_Manager.name = "POST_Manager";
     await POST_Manager.save();
     //post connection
     const POST_Connection = new Permission();
@@ -39,6 +39,7 @@ export class AdminRolesMigration1701638913517 implements MigrationInterface {
     //post reflect
     const POST_Reflect = new Permission();
     POST_Reflect.name = "POST_Reflect";
+    await POST_Reflect.save();
     //post transaction
     const POST_Transaction = new Permission();
     POST_Transaction.name = "POST_Transaction";
@@ -64,7 +65,7 @@ export class AdminRolesMigration1701638913517 implements MigrationInterface {
     //admin Role
     const Admin = new Role();
     Admin.roleName = "Admin";
-    Admin.permissions = [POST_Car, POST_Manager, POST_Parking, GET_Reflect, POST_Reflect];
+    Admin.permissions = [POST_Car, POST_Manager, POST_Parking, GET_Reflect, POST_Reflect, GET_Balance];
     await Admin.save();
 
     //admin User
