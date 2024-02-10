@@ -112,6 +112,16 @@ const validateManagerLogin = async (
         message: "Set your password first",
         data: {},
       });
+    } else if (x.email !== user.Email) {
+      //ensure it's case sensitive
+      logger.error(
+        `Login request used incorrect casing for manager Email ("${user.Email}") vs stored value ("${x.email}")`
+      );
+      res.status(404).json({
+        statusCode: 404,
+        message: "Invalid car credentials",
+        data: {},
+      });
     } else {
       next();
     }
