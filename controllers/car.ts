@@ -20,6 +20,8 @@ const user = (car: Car): user => {
       id: car.wallet ? car.wallet.id : null,
       amount: car.wallet ? car.wallet.amount : null,
     },
+    email: car.email? car.email: null,
+    owner: car.owner? car.owner: null,
     connection: parking.length > 0 ? parking[0] : null,
     role: { roleName: car.role.roleName },
     token: car.token ? car.token : null,
