@@ -77,20 +77,53 @@ export class AdminRolesMigration1701638913517 implements MigrationInterface {
     AdminUser.wallet = new Wallet();
     await AdminUser.wallet.save();
     await AdminUser.save();
+
     //create admin reflect accont
-    const reflect = new Reflect()
+    const reflect = new Reflect();
     reflect.mobileNo = env.ADMIN_REFLECT_MOBILE_NUMBER || "0569726909";
     reflect.password = "123moh2Ml";
     reflect.owner = "Smart Parking System";
-    await reflect.save()
-
+    await reflect.save();
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DELETE FROM Permission (name) VALUES("POST_Car")`);
+    await queryRunner.query(
+      `DELETE FROM Permission (name) VALUES("POST_Manager")`
+    );
+    await queryRunner.query(
+      `DELETE FROM Permission (name) VALUES("POST_Connection")`
+    );
+    await queryRunner.query(
+      `DELETE FROM Permission (name) VALUES("GET_Connection")`
+    );
+    await queryRunner.query(
+      `DELETE FROM Permission (name) VALUES("POST_Parking")`
+    );
+    await queryRunner.query(
+      `DELETE FROM Permission (name) VALUES("GET_Parking")`
+    );
+    await queryRunner.query(
+      `DELETE FROM Permission (name) VALUES("POST_Reflect")`
+    );
+    await queryRunner.query(
+      `DELETE FROM Permission (name) VALUES("GET_Reflect")`
+    );
+    await queryRunner.query(
+      `DELETE FROM Permission (name) VALUES("POST_Transaction")`
+    );
+    await queryRunner.query(
+      `DELETE FROM Permission (name) VALUES("GET_Transaction")`
+    );
+    await queryRunner.query(
+      `DELETE FROM Permission (name) VALUES("GET_Balance")`
+    );
     await queryRunner.query(`DELETE FROM Role WHERE roleName = "Admin`);
     await queryRunner.query(`DELETE FROM Role WHERE roleName = "User`);
     await queryRunner.query(`DELETE FROM Role WHERE roleName = "Manager`);
-    await queryRunner.query(`DELETE FROM Permission (name) VALUES("Admin")`);
-    await queryRunner.query(`DELETE FROM User WHERE car_Id = "1`);
+    await queryRunner.query(
+      `DELETE FROM User WHERE car_ID = "1"`
+    );
+    await queryRunner.query(`DELETE FROM Reflect WHERE mobileNo = "0569726909"`);
   }
 }
