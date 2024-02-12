@@ -20,8 +20,8 @@ const user = (car: Car): user => {
       id: car.wallet ? car.wallet.id : null,
       amount: car.wallet ? car.wallet.amount : null,
     },
-    email: car.email? car.email: null,
-    owner: car.owner? car.owner: null,
+    email: car.email ? car.email : null,
+    owner: car.owner ? car.owner : null,
     connection: parking?.length > 0 ? parking[0] : null,
     role: { roleName: car.role.roleName },
     token: car.token ? car.token : null,
@@ -85,8 +85,16 @@ const setPassword = async (req: express.Request, res: express.Response) => {
         return;
       }
       const secret = process.env.PASSWORD_SECRET + car.id;
-      const payload = jwt.verify(token, secret);
       const decode = jwt.decode(token, { json: true });
+      if ((decode as any)?.exp <= Date.now() / 1000) {
+        secureLog("info", `set passwrod with expired link: ${id}`);
+        return res.status(401).json({
+          statusCode: 401,
+          message: "password link has expired!",
+          data: {},
+        });
+      }
+      const payload = jwt.verify(token, secret);
       if (payload) {
         if (decode !== null && decode.id === car.id) {
           if (car.status === "inactive") {
@@ -173,9 +181,16 @@ const setManagerPassword = async (
       return;
     }
     const secret = process.env.PASSWORD_SECRET + car.email;
-    const payload = jwt.verify(token, secret);
     const decode = jwt.decode(token, { json: true });
-
+    if ((decode as any)?.exp <= Date.now() / 1000) {
+      secureLog("info", `password link has expired: ${email}`);
+      return res.status(401).json({
+        statusCode: 401,
+        message: "password link has expires!",
+        data: {},
+      });
+    }
+    const payload = jwt.verify(token, secret);
     if (payload) {
       if (decode !== null && decode.id === car.id) {
         if (car.status === "inactive") {
@@ -273,5 +288,5 @@ export {
   setManagerPassword,
   managerLogin,
   userLogin,
-  user
+  user,
 };
