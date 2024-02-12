@@ -7,13 +7,38 @@ import { Role } from "../DB/Entities/Role";
 import { Wallet } from "../DB/Entities/Wallet";
 import { In } from "typeorm";
 import { logger, secureLog } from "../log";
-import { user } from "../@types";
+import { hestory, user } from "../@types";
 import { Connection } from "../DB/Entities/Connection";
+import { calculateMinutesDifference } from "./connection";
 
 const user = (car: Car): user => {
-  const parking: Connection[] | null = car.connections?.filter((conn) => {
+  let parking: Connection[] | null = car.connections?.filter((conn) => {
     if (conn.status === "active") return conn;
   });
+  let temp: hestory = {
+    cost: 0,
+    duration: "",
+    location: "",
+    park_At: new Date().toTimeString(),
+    leave_At: new Date().toTimeString(),
+    parking_id: 0,
+    status: "inactive",
+  };
+  temp.parking_id = parking[0].parking.customid;
+  temp.cost = parking[0].cost;
+  temp.park_At = parking[0].start_time.toTimeString();
+  parking[0].status === "active"
+    ? delete temp.leave_At
+    : (temp.leave_At = parking[0].end_time.toTimeString());
+  temp.location = parking[0].parking.location;
+  temp.status = parking[0].status;
+  parking[0].status === "active"
+    ? delete temp.cost
+    : (temp.duration = `${calculateMinutesDifference(
+        parking[0].start_time.getTime(),
+        parking[0].end_time.getTime()
+      ).toFixed(2)} Minutes`);
+
   let user: user = {
     carID: car.car_ID ? car.car_ID : null,
     wallet: {
@@ -22,7 +47,7 @@ const user = (car: Car): user => {
     },
     email: car.email ? car.email : null,
     owner: car.owner ? car.owner : null,
-    connection: parking?.length > 0 ? parking[0] : null,
+    connection: parking !==null ? temp : null,
     role: { roleName: car.role.roleName },
     token: car.token ? car.token : null,
   };

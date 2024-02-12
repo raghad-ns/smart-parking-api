@@ -249,4 +249,4 @@ const getHistory = async (
     throw `new error fired: ${err}`;
   }
 };
-export { startConnection, endConnection, getHistory };
+export { startConnection, endConnection, getHistory, calculateMinutesDifference };

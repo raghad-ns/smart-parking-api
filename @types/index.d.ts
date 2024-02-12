@@ -17,7 +17,7 @@ export interface hestory {
   location: string;
   park_At: string;
   leave_At?: string;
-  duration: string;
+  duration: string ;
   cost?: number;
   status: "active" | "inactive";
 }
@@ -26,7 +26,7 @@ export interface user {
   carID: string | null;
   email: string | null;
   owner: string | null;
-  connection: Connection | null;
+  connection: hestory | null;
   wallet: { id: string | null; amount: number | null };
   role: { roleName: string | null };
   token: string | null;
