@@ -17,9 +17,11 @@ const validateNewCar = async (
     }
   });
 
-  const checkCar = await Car.findOneBy({ car_ID: car.Car_Id });
+  const checkCar = (await Car.findBy({ car_ID: car.Car_Id })).filter(
+    (ca) => ca.car_ID === car.Car_Id
+  );
 
-  if (checkCar !== null) {
+  if (checkCar.length) {
     errorList.push("This car already exist");
   }
 

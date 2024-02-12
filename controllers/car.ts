@@ -11,7 +11,7 @@ import { user } from "../@types";
 import { Connection } from "../DB/Entities/Connection";
 
 const user = (car: Car): user => {
-  const parking: Connection[] | null = car.connections.filter((conn) => {
+  const parking: Connection[] | null = car.connections?.filter((conn) => {
     if (conn.status === "active") return conn;
   });
   let user: user = {
@@ -22,7 +22,7 @@ const user = (car: Car): user => {
     },
     email: car.email? car.email: null,
     owner: car.owner? car.owner: null,
-    connection: parking.length > 0 ? parking[0] : null,
+    connection: parking?.length > 0 ? parking[0] : null,
     role: { roleName: car.role.roleName },
     token: car.token ? car.token : null,
   };
@@ -56,12 +56,12 @@ const insertCar = async (req: express.Request, res: express.Response) => {
       id: car.id,
     };
     const secret = process.env.PASSWORD_SECRET + car.id;
-    const token = jwt.sign(payload, secret, { expiresIn: "5m" });
+    const token = jwt.sign(payload, secret, { expiresIn: "15m" });
     const link = `https://localhost:${process.env.PORT}/home/set-password/${car.id}/${token}`;
     res.status(201).json({
       statusCode: 201,
       message: "User has been add Successfully",
-      data: { passwordLink: link, car: car },
+      data: { passwordLink: link, car: user(car) },
     });
   } catch (error) {
     console.log(error);
