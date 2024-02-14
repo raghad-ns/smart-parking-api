@@ -13,21 +13,26 @@ export interface Transactions {
 }
 
 export interface hestory {
-  parking_id: number;
-  location: string;
-  park_At: string;
-  leave_At?: string;
-  duration: string ;
+  parking_id?: number;
+  location?: string;
+  park_At: string | number;
+  leave_At?: string | number;
+  duration?: string ;
   cost?: number;
   status: "active" | "inactive";
 }
 
 export interface user {
-  carID: string | null;
+  carID?: string | null;
   email: string | null;
   owner: string | null;
-  connection: hestory | null;
-  wallet: { id: string | null; amount: number | null };
+  connection?: hestory | null;
+  wallet?: { id: string | null; amount: number | null };
   role: { roleName: string | null };
   token: string | null;
+}
+
+export interface amount {
+  id: string
+  balance: string
 }

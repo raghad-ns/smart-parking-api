@@ -73,9 +73,7 @@ router.post("/manager/signin", validateManagerLogin, (req, res) => {
         "info",
         `The manager with email: ${Email} has set his password successfully: ${data}`
       );
-      res
-        .status(200)
-        .json({ statusCode: 200, message: "Ok", data: user(data.car) });
+      res.status(200).json({ statusCode: 200, message: "Ok", data: data });
     })
     .catch((err) => {
       logger.error(`Erron while manager login: ${err}`);

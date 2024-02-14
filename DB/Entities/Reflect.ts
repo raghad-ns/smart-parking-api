@@ -10,7 +10,7 @@ export class Reflect extends BaseEntity {
   @Column('text', {nullable: false})
   owner: string;
 
-  @Column('float', {nullable: true, default:10})
+  @Column('float', {nullable: true, default:0})
   amount: number;
 
 
