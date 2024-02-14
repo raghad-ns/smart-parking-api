@@ -1,10 +1,12 @@
 import express from "express";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { Transaction } from "../DB/Entities/Transaction";
 import { Reflect } from "../DB/Entities/Reflect";
 import { Car } from "../DB/Entities/Car";
 import dataSource from "../DB/dataSource";
 import { secureLog, logger } from "../log";
+import { amount } from "../@types";
 const startTransaction = async (
   req: express.Request,
   res: express.Response
@@ -13,7 +15,10 @@ const startTransaction = async (
   const source = await Reflect.findOneBy({ mobileNo: req.body.mobileNo });
   const car = await Car.findOneBy({ car_ID: req.body.carId });
   if (!source || !car) {
-    secureLog("info", `Transfer money to unexisted car ${req.body}`);
+    secureLog(
+      "info",
+      `Transfer money to unexisted car or unexisted reflect account ${req.body}`
+    );
     return res.status(401).send("Invalid User or Car");
   } else {
     try {
@@ -68,6 +73,22 @@ const chargeWallet = async (req: express.Request, res: express.Response) => {
   }
   // check the otp with user entered otp
   if (await bcrypt.compare(OTP, transaction.OTP)) {
+    //verify the wallet token and update it
+    const verify = jwt.verify(
+      transaction.wallet.amount,
+      process.env.MONEY_JWT_KEY || ""
+    );
+    if (!verify) {
+      logger.error(
+        `the amount token with id: ${transaction.wallet.id} failed to pass verificaion`
+      );
+    }
+    const decoded = jwt.decode(transaction.wallet.amount, { json: true });
+    const data: amount = {
+      id: transaction.wallet.id,
+      balance: (parseFloat(decoded?.balance) + transaction.amount).toString(),
+    };
+    const token = jwt.sign(data, process.env.MONEY_JWT_KEY || "");
     // mark this as confirmed and save it to database
     transaction.confirmedAt = new Date();
 
@@ -78,7 +99,7 @@ const chargeWallet = async (req: express.Request, res: express.Response) => {
       transaction.status = "Done";
 
       transaction.source.amount -= transaction.amount;
-      transaction.wallet.amount += transaction.amount;
+      transaction.wallet.amount = token;
       if (adminReflect) {
         adminReflect.amount += transaction.amount;
       }

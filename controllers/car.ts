@@ -7,52 +7,75 @@ import { Role } from "../DB/Entities/Role";
 import { Wallet } from "../DB/Entities/Wallet";
 import { In } from "typeorm";
 import { logger, secureLog } from "../log";
-import { hestory, user } from "../@types";
+import { amount, hestory, user } from "../@types";
 import { Connection } from "../DB/Entities/Connection";
 import { calculateMinutesDifference } from "./connection";
 
-const user = (car: Car): user => {
-  let parking: Connection[] | null = car.connections?.filter((conn) => {
-    if (conn.status === "active") return conn;
-  });
-  let temp: hestory = {
-    cost: 0,
-    duration: "",
-    location: "",
-    park_At: new Date().toTimeString(),
-    leave_At: new Date().toTimeString(),
-    parking_id: 0,
-    status: "inactive",
+const user = (car: Car) => {
+  let temp: user = {
+    carID: null,
+    email: null,
+    owner: null,
+    role: { roleName: null },
+    token: null,
+    connection: null,
+    wallet: { id: null, amount: null },
   };
-  temp.parking_id = parking[0].parking.customid;
-  temp.cost = parking[0].cost;
-  temp.park_At = parking[0].start_time.toTimeString();
-  parking[0].status === "active"
-    ? delete temp.leave_At
-    : (temp.leave_At = parking[0].end_time.toTimeString());
-  temp.location = parking[0].parking.location;
-  temp.status = parking[0].status;
-  parking[0].status === "active"
-    ? delete temp.cost
-    : (temp.duration = `${calculateMinutesDifference(
-        parking[0].start_time.getTime(),
-        parking[0].end_time.getTime()
-      ).toFixed(2)} Minutes`);
+  if (car.role.roleName === "Admin") {
+    temp.carID = car.car_ID;
+    temp.role.roleName = car.role.roleName;
+    temp.email = car.email;
+    temp.owner = car.owner? car.owner: null;
+    temp.token = temp.token = car.token ? car.token : null;
+    temp.wallet = {
+      id: car.wallet.id,
+      amount: parseFloat(
+        jwt.decode(car.wallet.amount, { json: true })?.balance
+      ),
+    };
+    return temp;
+  } else if (car.role.roleName === "Manager") {
+    temp.token = car.token ? car.token : null;
+    temp.role.roleName = car.role.roleName;
+    temp.email = car.email;
+    temp.owner = car.owner;
+    temp.wallet = {
+      id: car.wallet.id,
+      amount: parseFloat(
+        jwt.decode(car.wallet.amount, { json: true })?.balance
+      ),
+    };
+    return temp;
+  } else if (car.role.roleName === "User") {
+    const connection = car.connections.filter(
+      (conn) => conn.status === "active"
+    );
+    temp.carID = car.car_ID;
+    temp.email = car.email;
+    temp.owner = car.owner;
+    temp.role.roleName = car.role.roleName;
+    temp.token = car.token ? car.token : null;
+    temp.wallet = {
+      id: car.wallet.id,
+      amount: parseFloat(
+        jwt.decode(car.wallet.amount, { json: true })?.balance
+      ),
+    };
 
-  let user: user = {
-    carID: car.car_ID ? car.car_ID : null,
-    wallet: {
-      id: car.wallet ? car.wallet.id : null,
-      amount: car.wallet ? car.wallet.amount : null,
-    },
-    email: car.email ? car.email : null,
-    owner: car.owner ? car.owner : null,
-    connection: parking !==null ? temp : null,
-    role: { roleName: car.role.roleName },
-    token: car.token ? car.token : null,
-  };
+    if (connection.length > 0) {
+      //form the response in progress connection
+      const activeConnection: hestory = {
+        location: connection[0].parking.location,
+        parking_id: connection[0].parking.customid,
+        status: connection[0].status,
+        park_At: connection[0].start_time.toLocaleString(),
+      };
+    } else {
+      temp.connection = null;
+    }
 
-  return user;
+    return temp;
+  }
 };
 
 const insertCar = async (req: express.Request, res: express.Response) => {
@@ -73,6 +96,11 @@ const insertCar = async (req: express.Request, res: express.Response) => {
       });
     }
     let wallet = new Wallet();
+    const data: amount = {
+      id: wallet.id,
+      balance: "0",
+    };
+    wallet.amount = jwt.sign(data, process.env.MONEY_JWT_KEY || "");
     car.wallet = wallet;
     await wallet.save();
     await car.save();
@@ -178,7 +206,7 @@ const insertManager = async (req: express.Request, res: express.Response) => {
     res.status(201).json({
       statusCode: 201,
       message: "Manager added successfully",
-      data: { manager: car, passwordLink: link },
+      data: { manager: user(car), passwordLink: link },
     });
   } catch (error) {
     logger.error(`Internal server error while adding new manager: ${error}`);
@@ -269,7 +297,7 @@ const managerLogin = async (email: string, password: string) => {
       );
       manager.token = token;
       await manager.save();
-      return { token, car: manager };
+      return user(manager);
     } else {
       throw "Invalid Username or password!";
     }

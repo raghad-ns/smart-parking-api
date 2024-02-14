@@ -3,7 +3,6 @@ import { Parking } from "../DB/Entities/Parking";
 import { GetAll } from "../@types";
 const insertParking = (payload: Parking) => {
     const newParking = Parking.create(payload);
-    console.log(payload);
     
     return newParking.save();
     

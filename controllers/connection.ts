@@ -5,7 +5,7 @@ import { Parking } from "../DB/Entities/Parking";
 import { Car } from "../DB/Entities/Car";
 import jwt from "jsonwebtoken";
 import { Wallet } from "../DB/Entities/Wallet";
-import { GetAll, hestory } from "../@types";
+import { GetAll, amount, hestory } from "../@types";
 import { logger, secureLog } from "../log";
 
 const startConnection = async (req: express.Request, res: express.Response) => {
@@ -97,13 +97,45 @@ const charge = async (wallet: Wallet, amount: number) => {
       data: `Failed To charge the car for parking `,
     };
   }
+  //user verify and add new balance
+  const userVerify = jwt.verify(wallet.amount, process.env.MONEY_JWT_KEY || "");
+  if (!userVerify) {
+    logger.error(
+      `user balance failed to be verifyed the wallet id: ${wallet.id} and the amount: ${wallet.amount}`
+    );
+  }
+  const userDecode = jwt.decode(wallet.amount, { json: true });
+  let newbalence: number = parseFloat(userDecode?.balance) - amount;
+  const data: amount = {
+    id: wallet.id,
+    balance: newbalence.toString(),
+  };
+  const userToken = jwt.sign(data, process.env.MONEY_JWT_KEY || "");
+  //admin verify and add new balance
+  const adminVerify = jwt.verify(
+    admin.wallet.amount,
+    process.env.MONEY_JWT_KEY || ""
+  );
+
+  if (!adminVerify) {
+    logger.error(
+      `admin balance failed to be verifyed the wallet id: ${wallet.id} and the amount: ${wallet.amount}`
+    );
+  }
+  const adminDecode = jwt.decode(admin.wallet.amount, { json: true });
+  const adminBalance: number = parseFloat(adminDecode?.balance) + amount;
   const adminWallet = admin?.wallet;
+  const adminData: amount = {
+    id: adminWallet.id,
+    balance: adminBalance.toString(),
+  };
+  const adminToken = jwt.sign(adminData, process.env.MONEY_JWT_KEY || "");
   const querryRunner = dataSource.createQueryRunner();
   await querryRunner.connect();
   await querryRunner.startTransaction();
   try {
-    adminWallet.amount += amount;
-    wallet.amount -= amount;
+    adminWallet.amount = adminToken;
+    wallet.amount = userToken;
     await wallet.save();
     await adminWallet.save();
     await querryRunner.commitTransaction();
@@ -224,10 +256,10 @@ const getHistory = async (
         };
         temp.parking_id = i.parking.customid;
         temp.cost = i.cost;
-        temp.park_At = i.start_time.toTimeString();
+        temp.park_At = i.start_time.toLocaleString();
         i.status === "active"
           ? delete temp.leave_At
-          : (temp.leave_At = i.end_time.toTimeString());
+          : (temp.leave_At = i.end_time.toLocaleString());
         temp.location = i.parking.location;
         temp.status = i.status;
         i.status === "active"
@@ -249,4 +281,9 @@ const getHistory = async (
     throw `new error fired: ${err}`;
   }
 };
-export { startConnection, endConnection, getHistory, calculateMinutesDifference };
+export {
+  startConnection,
+  endConnection,
+  getHistory,
+  calculateMinutesDifference,
+};
