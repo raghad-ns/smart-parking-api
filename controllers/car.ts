@@ -40,12 +40,6 @@ const user = (car: Car) => {
     temp.role.roleName = car.role.roleName;
     temp.email = car.email;
     temp.owner = car.owner;
-    temp.wallet = {
-      id: car.wallet.id,
-      amount: parseFloat(
-        jwt.decode(car.wallet.amount, { json: true })?.balance
-      ),
-    };
     return temp;
   } else if (car.role.roleName === "User") {
     const connection = car.connections.filter(
@@ -119,7 +113,6 @@ const insertCar = async (req: express.Request, res: express.Response) => {
       data: { passwordLink: link, car: user(car) },
     });
   } catch (error) {
-    console.log(error);
     throw `${error}`;
   }
 };
@@ -198,8 +191,6 @@ const insertManager = async (req: express.Request, res: express.Response) => {
     };
     const secret = process.env.PASSWORD_SECRET + car.email;
     const token = jwt.sign(payload, secret, { expiresIn: "5m" });
-    console.log("insert manager");
-
     const link = `https://localhost:${process.env.PORT}/home/set-manager-password/${car.email}/${token}`;
     secureLog(
       "info",
@@ -230,30 +221,40 @@ const setManagerPassword = async (
       throw "invalid link";
     }
     const { Password, Confirm_Password } = req.body;
-    const car = await Car.findOneBy({ email: email });
+    if (!Password || !Confirm_Password) {
+      throw "Passwords do not exist";
+    }
+    const x = await Car.find({
+      relations: { role: true },
+      where: { role: { roleName: "Manager" || "Admin" }, email: email },
+    });
+    const car = x.filter((val) => val.email === email);
+
     if (car === null) {
       throw "invalid link...";
       return;
+    } else if (car.length > 1) {
+      throw "More than one cars found for this email";
     }
-    const secret = process.env.PASSWORD_SECRET + car.email;
+    const secret = process.env.PASSWORD_SECRET + car[0].email;
     const decode = jwt.decode(token, { json: true });
     if ((decode as any)?.exp <= Date.now() / 1000) {
       secureLog("info", `password link has expired: ${email}`);
       return res.status(401).json({
         statusCode: 401,
-        message: "password link has expires!",
+        message: "password link has expired!",
         data: {},
       });
     }
     const payload = jwt.verify(token, secret);
     if (payload) {
-      if (decode !== null && decode.id === car.id) {
-        if (car.status === "inactive") {
+      if (decode !== null && decode.id === car[0].id) {
+        if (car[0].status === "inactive") {
           const passwordSt = passwordMatched(Password, Confirm_Password);
           if (passwordSt === true) {
-            car.password = await bcrypt.hash(Password, 10);
-            car.status = "active";
-            await car.save();
+            car[0].password = await bcrypt.hash(Password, 10);
+            car[0].status = "active";
+            await car[0].save();
           } else {
             throw `${passwordSt}`;
           }
