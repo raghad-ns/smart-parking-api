@@ -21,11 +21,12 @@ const user = (car: Car) => {
     connection: null,
     wallet: { id: null, amount: null },
   };
+  if (car.status !== "active") return null;
   if (car.role.roleName === "Admin") {
     temp.carID = car.car_ID;
     temp.role.roleName = car.role.roleName;
     temp.email = car.email;
-    temp.owner = car.owner? car.owner: null;
+    temp.owner = car.owner ? car.owner : null;
     temp.token = temp.token = car.token ? car.token : null;
     temp.wallet = {
       id: car.wallet.id,
@@ -70,6 +71,7 @@ const user = (car: Car) => {
         status: connection[0].status,
         park_At: connection[0].start_time.toLocaleString(),
       };
+      temp.connection = activeConnection;
     } else {
       temp.connection = null;
     }
