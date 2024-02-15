@@ -52,10 +52,13 @@ const validateManager = async (
     }
   });
   //to check if ther are no manager with the same email
-  const [test] = await Car.findAndCount({
+  const [x] = await Car.findAndCount({
     relations: { role: true },
     where: { email: car.Email, role: { roleName: In(["Manager", "Admin"]) } },
   });
+  const test = x.filter(
+    (val) =>  val.email === car.Email
+  );
 
   if (test.length !== 0) {
     errorList.push("There are a manager with the same email");

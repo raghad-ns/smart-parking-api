@@ -87,7 +87,7 @@ router.post("/manager/signin", validateManagerLogin, (req, res) => {
 
 router.post("/set-manager-password/:email/:token", async (req, res) => {
   setManagerPassword(req, res)
-    .then(() => {
+    .then((data) => {
       secureLog(
         "info",
         `Successfully set the password for the manager with this email: ${req.params.email}`
@@ -95,7 +95,7 @@ router.post("/set-manager-password/:email/:token", async (req, res) => {
       res.status(200).json({
         statusCode: 200,
         message: "Password has been set successfully",
-        data: {},
+        data: {data},
       });
     })
     .catch((err) => {

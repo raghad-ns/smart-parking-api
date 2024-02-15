@@ -3,6 +3,7 @@ import { GetAll, Transactions } from "../@types";
 import jwt from "jsonwebtoken";
 import { Car } from "../DB/Entities/Car";
 import { Transaction } from "../DB/Entities/Transaction";
+import { logger } from "../log";
 const getWalletTransactions = async (
   req: express.Request,
   res: express.Response,
@@ -26,7 +27,7 @@ const getWalletTransactions = async (
   });
   //changing the form of wallet transactions
   let test: Transactions[] = [];
-  transactions.forEach(i =>  {
+  transactions.forEach((i) => {
     let data: Transactions = {
       balance: 0,
       confirmed: new Date(),
@@ -38,7 +39,7 @@ const getWalletTransactions = async (
     data.from = i.source.mobileNo;
     data.type = i.type;
     test.push(data);
-  })
+  });
   return test;
 };
 
@@ -49,10 +50,23 @@ const getWalletBalance = async (
   try {
     const token = req.headers["authorization"] || "";
     const decoded = jwt.decode(token, { json: true });
-    const wallet = await Car.findOneBy({
+    const car = await Car.findOneBy({
       id: decoded?.userId,
     });
-    return wallet?.wallet.amount;
+    const wallet = car?.wallet;
+
+    if (!car) throw "Car not found";
+    else if (!wallet) throw "Wallet not connected to this car";
+    const verify = jwt.verify(wallet?.amount, process.env.MONEY_JWT_KEY || "");
+    if (!verify) {
+      logger.error(
+        `the amount token with id: ${wallet.id} failed to pass verificaion: ${wallet.amount}`
+      );
+    }
+    const balance = parseFloat(
+      jwt.decode(wallet?.amount, { json: true })?.balance
+    );
+    return balance;
   } catch (err) {
     throw err;
   }
