@@ -7,6 +7,7 @@ import { Car } from "../DB/Entities/Car";
 import dataSource from "../DB/dataSource";
 import { secureLog, logger } from "../log";
 import { amount } from "../@types";
+import sendSMS from "./sendsms";
 const startTransaction = async (
   req: express.Request,
   res: express.Response
@@ -31,6 +32,14 @@ const startTransaction = async (
       const otp = generateOTP();
       transaction.OTP = otp;
       await transaction.save();
+      try {
+        await sendSMS(
+          `Your transaction confirmation code is: ${otp}`,
+          `+970${transaction.source.mobileNo}`
+        );
+      } catch (error) {
+        console.log(error);
+      }
       return { ID: transaction.id, OTP: otp };
     } catch (error) {
       logger.error(`Error in /api/transaction/charge-wallet : ${error}`);

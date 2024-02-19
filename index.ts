@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
   res.send("Welcome to Express & TypeScript Server");
 });
 
-server.listen(port, () => {
+server.listen(port, async() => {
   console.log(`App is lestining to PORT.. : ${port} using https`);
   secureLog("info", "App is lestining to PORT: 5000");
   dataSource
