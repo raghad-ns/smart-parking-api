@@ -31,6 +31,7 @@
   "dependencies": {
     "@types/cors": "^2.8.17",
     "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
     "braintree": "^3.21.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -44,13 +45,14 @@
     "ts-node": "^10.9.1",
     "twilio": "^4.22.0",
     "typeorm": "^0.3.17",
-    "typescript": "^5.2.2",
+    "typescript": "^5.3.3",
     "uuid": "^9.0.1",
     "validator": "^13.11.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.1",
+    "@types/braintree": "^3.3.11",
     "@types/cookie-parser": "^1.4.6",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
